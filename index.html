@@ -56,15 +56,13 @@
             min-width: 1200px;
         }
 
-        /* 1. Header completo 192px fijo */
+        /* 1. Header completo 192px fijo. 
+           (Ocupa el 100% de la pantalla para que los fondos no se corten) */
         .fixed-header {
             position: sticky;
             top: 0;
             z-index: 50;
             width: 100%;
-            min-width: 1200px;
-            max-width: 1792px;
-            margin: 0 auto;
             height: var(--header-height);
             min-height: var(--header-height);
             max-height: var(--header-height);
@@ -197,162 +195,168 @@
 
     <!-- HEADER (192px exactos) -->
     <header class="fixed-header flex flex-col">
-        <!-- Fila 1: Top Nav (64px) -->
-        <div class="flex items-center justify-between px-6 h-16 shrink-0">
-            <div class="flex items-center h-8">
-                <!-- Logo SVG -->
-                <div class="flex items-center h-full">
-                    <svg width="146" height="40" viewBox="0 0 146 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M30.1484 9.50942H6.05986C5.96528 9.50942 5.87296 9.54503 5.8054 9.60787L0.105839 14.9098C0.0382823 14.9726 0 15.0585 0 15.1465V20.3688C0 20.4568 0.0382823 20.5427 0.105839 20.6055L5.80765 25.9095C5.87521 25.9724 5.96754 26.008 6.06212 26.008H26.9778C27.1759 26.008 27.3381 25.8593 27.3381 25.6728V20.8443C27.3381 20.66 27.1759 20.5092 26.9778 20.5092H6.27154C6.07338 20.5092 5.91124 20.3604 5.91124 20.174V15.3434C5.91124 15.1591 6.07112 15.0082 6.27154 15.0082H29.9368C30.1349 15.0082 30.2971 15.1591 30.2971 15.3434V30.1641C30.2971 30.3484 30.1349 30.4992 29.9368 30.4992H10.8632C10.7686 30.4992 10.6763 30.5348 10.6087 30.5977L5.41807 35.4283C5.19063 35.6398 5.35277 36.0001 5.67254 36.0001H30.1507C30.2453 36.0001 30.3376 35.9645 30.4052 35.9017L36.1047 30.5977C36.1723 30.5348 36.2106 30.449 36.2106 30.361V15.1465C36.2106 15.0585 36.1723 14.9726 36.1047 14.9098L30.4052 9.60578C30.3376 9.54294 30.2453 9.50732 30.1507 9.50732" fill="#3557D4"/>
-                        <path d="M77.0009 20.1719V15.1465C77.0009 15.0585 76.9626 14.9726 76.8951 14.9098L71.1932 9.60578C71.1257 9.54294 71.0334 9.50732 70.9388 9.50732H46.8502C46.7556 9.50732 46.6633 9.54294 46.5957 9.60578L40.8939 14.9098C40.8264 14.9726 40.7881 15.0585 40.7881 15.1465V20.3688C40.7881 20.4568 40.8264 20.5427 40.8939 20.6055L46.5957 25.9095C46.6633 25.9724 46.7556 26.008 46.8502 26.008H79.9441C80.1423 26.008 80.3044 25.8572 80.3044 25.6728V20.8443C80.3044 20.66 80.1423 20.5092 79.9441 20.5092H77.359C77.1608 20.5092 76.9986 20.3583 76.9986 20.174M70.7271 20.5092H47.0619C46.8637 20.5092 46.7016 20.3583 46.7016 20.174V15.3455C46.7016 15.1612 46.8637 15.0103 47.0619 15.0103H70.7271C70.9253 15.0103 71.0874 15.1612 71.0874 15.3455V20.174C71.0874 20.3583 70.9253 20.5092 70.7271 20.5092Z" fill="#3557D4"/>
-                        <path d="M145.449 14.9098L139.747 9.60578C139.68 9.54294 139.587 9.50732 139.493 9.50732H118.573C118.375 9.50732 118.212 9.65815 118.212 9.84249V14.671C118.212 14.8553 118.375 15.0062 118.573 15.0062H139.283C139.482 15.0062 139.644 15.157 139.644 15.3413V20.1719C139.644 20.3562 139.482 20.5071 139.283 20.5071H115.618C115.42 20.5071 115.258 20.3562 115.258 20.1719V10.318C115.258 10.0205 114.871 9.86972 114.643 10.0813L109.453 14.9098C109.385 14.9726 109.347 15.0585 109.347 15.1465V20.3688C109.347 20.4568 109.385 20.5427 109.453 20.6055L115.154 25.9095C115.222 25.9724 115.314 26.008 115.409 26.008H139.497C139.592 26.008 139.684 25.9724 139.752 25.9095L145.454 20.6055C145.521 20.5427 145.559 20.4568 145.559 20.3688V15.1465C145.559 15.0585 145.521 14.9726 145.454 14.9098" fill="#3557D4"/>
-                        <path d="M85.3415 4H82.7451C82.5469 4 82.3848 4.15082 82.3848 4.33517V9.13643C82.3848 9.32077 82.5469 9.47159 82.7451 9.47159H84.9812C85.1794 9.47159 85.3415 9.62242 85.3415 9.80676V25.6727C85.3415 25.8571 85.5036 26.0079 85.7018 26.0079H90.8924C91.0906 26.0079 91.2528 25.8571 91.2528 25.6727V4.33517C91.2528 4.15082 91.0929 4 90.8924 4H85.3415Z" fill="#3557D4"/>
-                        <path d="M98.8044 4H96.208C96.0098 4 95.8477 4.15082 95.8477 4.33517V9.13643C95.8477 9.32077 96.0098 9.47159 96.208 9.47159H98.4441C98.6423 9.47159 98.8044 9.62242 98.8044 9.80676V25.6727C98.8044 25.8571 98.9665 26.0079 99.1647 26.0079H104.355C104.554 26.0079 104.716 25.8571 104.716 25.6727V4.33517C104.716 4.15082 104.556 4 104.355 4H98.8044Z" fill="#3557D4"/>
-                    </svg>
-                </div>
-            </div>
-            
-            <!-- Barra de Búsqueda (600px ancho fijo) -->
-            <div class="w-[600px] shrink-0 mx-8 relative flex items-center h-8">
-                <i class="ph ph-magnifying-glass absolute left-4 text-gray-500 text-lg font-bold"></i>
-                <input type="text" placeholder="Buscá un instrumento" class="w-full h-full pl-11 pr-4 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:border-brand-active focus:ring-1 focus:ring-brand-active">
-            </div>
-
-            <!-- Acciones Derecha (gap 8px) -->
-            <div class="flex items-center gap-2 h-8">
-                <button class="text-gray-600 hover:text-gray-900 transition-colors flex items-center justify-center h-full w-8"><i class="ph ph-question text-2xl"></i></button>
-                <button class="text-gray-600 hover:text-gray-900 transition-colors relative flex items-center justify-center h-full w-8">
-                    <i class="ph ph-bell text-2xl"></i>
-                    <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
-                </button>
-                <button class="text-gray-600 hover:text-gray-900 transition-colors flex items-center justify-center h-full w-8"><i class="ph ph-wallet text-2xl"></i></button>
-                <button class="text-gray-600 hover:text-gray-900 transition-colors flex items-center justify-center h-full w-8"><i class="ph ph-user-circle text-2xl"></i></button>
-                
-                <!-- Botón Operar Complejo -->
-                <div class="flex items-center bg-brand-active text-white rounded-lg shadow-sm h-full overflow-hidden">
-                    <button class="px-4 h-full font-medium hover:bg-blue-700 transition-colors text-[14px] flex items-center">
-                        Operar
-                    </button>
-                    <div class="w-px h-5 bg-white/40"></div>
-                    <button class="px-2.5 h-full hover:bg-blue-700 transition-colors flex items-center">
-                        <i class="ph ph-caret-down text-lg"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Fila 2: Main Nav (64px) -->
-        <div class="flex justify-between px-6 h-16 border-b border-gray-200 shrink-0">
-            <nav class="flex items-end h-full gap-1">
-                <a href="#" class="relative h-12 flex flex-col justify-start group">
-                    <span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors">
-                        Inicio
-                    </span>
-                </a>
-                
-                <!-- Tab Activo "Mercados" (Caja 36px, alineada abajo) -->
-                <a href="#" class="relative h-12 flex flex-col justify-start">
-                    <span class="h-9 px-5 flex items-center justify-center text-brand-active text-[14px] font-bold bg-[#f4f5f8] rounded-[10px]">
-                        Mercados
-                    </span>
-                    <span class="absolute -bottom-[1px] left-0 w-full h-[3px] bg-brand-active rounded-t-sm z-10"></span>
-                </a>
-                
-                <a href="#" class="relative h-12 flex flex-col justify-start group">
-                    <span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors gap-1">
-                        Portafolio <i class="ph ph-caret-down text-sm"></i>
-                    </span>
-                </a>
-                <a href="#" class="relative h-12 flex flex-col justify-start group">
-                    <span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors">
-                        Resultados
-                    </span>
-                </a>
-                <a href="#" class="relative h-12 flex flex-col justify-start group">
-                    <span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors">
-                        Actividad
-                    </span>
-                </a>
-                <a href="#" class="relative h-12 flex flex-col justify-start group">
-                    <span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors gap-1">
-                        Cuenta <i class="ph ph-caret-down text-sm"></i>
-                    </span>
-                </a>
-                
-                <!-- Tab Versiones (Dropdown) -->
-                <div class="relative h-12 flex flex-col justify-start group">
-                    <button class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors gap-1 outline-none">
-                        Versión 0 <i class="ph ph-caret-down text-sm"></i>
-                    </button>
-                    <!-- Dropdown Menu -->
-                    <div class="absolute top-10 left-0 w-56 bg-white border border-gray-200 rounded-lg shadow-xl hidden group-hover:block z-[100] overflow-hidden">
-                        <a href="index.html" class="block px-4 py-2.5 text-[13px] text-brand-active bg-gray-50 font-medium hover:bg-gray-100 border-b border-gray-100 transition-colors">
-                            Versión 0 (Original)
-                        </a>
-                        <a href="mercados_v1.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">
-                            Versión 1 (Scroll)
-                        </a>
-                        <a href="mercados_v2.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">
-                            Versión 2 (Sticky)
-                        </a>
-                        <a href="mercados_v3.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active transition-colors">
-                            Versión 3 (Expandir card)
-                        </a>
+        <!-- Fila 1: Top Nav (64px) -> Fondo transparente/blanco hasta los bordes, contenido centrado max 1792px -->
+        <div class="w-full shrink-0 flex justify-center">
+            <div class="flex items-center justify-between px-6 h-16 w-full max-w-[1792px]">
+                <div class="flex items-center h-8">
+                    <!-- Logo SVG -->
+                    <div class="flex items-center h-full">
+                        <svg width="146" height="40" viewBox="0 0 146 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M30.1484 9.50942H6.05986C5.96528 9.50942 5.87296 9.54503 5.8054 9.60787L0.105839 14.9098C0.0382823 14.9726 0 15.0585 0 15.1465V20.3688C0 20.4568 0.0382823 20.5427 0.105839 20.6055L5.80765 25.9095C5.87521 25.9724 5.96754 26.008 6.06212 26.008H26.9778C27.1759 26.008 27.3381 25.8593 27.3381 25.6728V20.8443C27.3381 20.66 27.1759 20.5092 26.9778 20.5092H6.27154C6.07338 20.5092 5.91124 20.3604 5.91124 20.174V15.3434C5.91124 15.1591 6.07112 15.0082 6.27154 15.0082H29.9368C30.1349 15.0082 30.2971 15.1591 30.2971 15.3434V30.1641C30.2971 30.3484 30.1349 30.4992 29.9368 30.4992H10.8632C10.7686 30.4992 10.6763 30.5348 10.6087 30.5977L5.41807 35.4283C5.19063 35.6398 5.35277 36.0001 5.67254 36.0001H30.1507C30.2453 36.0001 30.3376 35.9645 30.4052 35.9017L36.1047 30.5977C36.1723 30.5348 36.2106 30.449 36.2106 30.361V15.1465C36.2106 15.0585 36.1723 14.9726 36.1047 14.9098L30.4052 9.60578C30.3376 9.54294 30.2453 9.50732 30.1507 9.50732" fill="#3557D4"/>
+                            <path d="M77.0009 20.1719V15.1465C77.0009 15.0585 76.9626 14.9726 76.8951 14.9098L71.1932 9.60578C71.1257 9.54294 71.0334 9.50732 70.9388 9.50732H46.8502C46.7556 9.50732 46.6633 9.54294 46.5957 9.60578L40.8939 14.9098C40.8264 14.9726 40.7881 15.0585 40.7881 15.1465V20.3688C40.7881 20.4568 40.8264 20.5427 40.8939 20.6055L46.5957 25.9095C46.6633 25.9724 46.7556 26.008 46.8502 26.008H79.9441C80.1423 26.008 80.3044 25.8572 80.3044 25.6728V20.8443C80.3044 20.66 80.1423 20.5092 79.9441 20.5092H77.359C77.1608 20.5092 76.9986 20.3583 76.9986 20.174M70.7271 20.5092H47.0619C46.8637 20.5092 46.7016 20.3583 46.7016 20.174V15.3455C46.7016 15.1612 46.8637 15.0103 47.0619 15.0103H70.7271C70.9253 15.0103 71.0874 15.1612 71.0874 15.3455V20.174C71.0874 20.3583 70.9253 20.5092 70.7271 20.5092Z" fill="#3557D4"/>
+                            <path d="M145.449 14.9098L139.747 9.60578C139.68 9.54294 139.587 9.50732 139.493 9.50732H118.573C118.375 9.50732 118.212 9.65815 118.212 9.84249V14.671C118.212 14.8553 118.375 15.0062 118.573 15.0062H139.283C139.482 15.0062 139.644 15.157 139.644 15.3413V20.1719C139.644 20.3562 139.482 20.5071 139.283 20.5071H115.618C115.42 20.5071 115.258 20.3562 115.258 20.1719V10.318C115.258 10.0205 114.871 9.86972 114.643 10.0813L109.453 14.9098C109.385 14.9726 109.347 15.0585 109.347 15.1465V20.3688C109.347 20.4568 109.385 20.5427 109.453 20.6055L115.154 25.9095C115.222 25.9724 115.314 26.008 115.409 26.008H139.497C139.592 26.008 139.684 25.9724 139.752 25.9095L145.454 20.6055C145.521 20.5427 145.559 20.4568 145.559 20.3688V15.1465C145.559 15.0585 145.521 14.9726 145.454 14.9098" fill="#3557D4"/>
+                            <path d="M85.3415 4H82.7451C82.5469 4 82.3848 4.15082 82.3848 4.33517V9.13643C82.3848 9.32077 82.5469 9.47159 82.7451 9.47159H84.9812C85.1794 9.47159 85.3415 9.62242 85.3415 9.80676V25.6727C85.3415 25.8571 85.5036 26.0079 85.7018 26.0079H90.8924C91.0906 26.0079 91.2528 25.8571 91.2528 25.6727V4.33517C91.2528 4.15082 91.0929 4 90.8924 4H85.3415Z" fill="#3557D4"/>
+                            <path d="M98.8044 4H96.208C96.0098 4 95.8477 4.15082 95.8477 4.33517V9.13643C95.8477 9.32077 96.0098 9.47159 96.208 9.47159H98.4441C98.6423 9.47159 98.8044 9.62242 98.8044 9.80676V25.6727C98.8044 25.8571 98.9665 26.0079 99.1647 26.0079H104.355C104.554 26.0079 104.716 25.8571 104.716 25.6727V4.33517C104.716 4.15082 104.556 4 104.355 4H98.8044Z" fill="#3557D4"/>
+                        </svg>
                     </div>
                 </div>
-            </nav>
-            <div class="flex items-center h-full">
-                <div class="border border-blue-600 bg-blue-50/50 rounded-full px-5 h-8 flex items-center text-[13px] text-gray-800 font-medium tracking-wide">
-                    CC 125780 | Pérez, Juan C...
+                
+                <!-- Barra de Búsqueda (600px ancho fijo) -->
+                <div class="w-[600px] shrink-0 mx-8 relative flex items-center h-8">
+                    <i class="ph ph-magnifying-glass absolute left-4 text-gray-500 text-lg font-bold"></i>
+                    <input type="text" placeholder="Buscá un instrumento" class="w-full h-full pl-11 pr-4 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:border-brand-active focus:ring-1 focus:ring-brand-active">
+                </div>
+
+                <!-- Acciones Derecha (gap 8px) -->
+                <div class="flex items-center gap-2 h-8">
+                    <button class="text-gray-600 hover:text-gray-900 transition-colors flex items-center justify-center h-full w-8"><i class="ph ph-question text-2xl"></i></button>
+                    <button class="text-gray-600 hover:text-gray-900 transition-colors relative flex items-center justify-center h-full w-8">
+                        <i class="ph ph-bell text-2xl"></i>
+                        <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+                    </button>
+                    <button class="text-gray-600 hover:text-gray-900 transition-colors flex items-center justify-center h-full w-8"><i class="ph ph-wallet text-2xl"></i></button>
+                    <button class="text-gray-600 hover:text-gray-900 transition-colors flex items-center justify-center h-full w-8"><i class="ph ph-user-circle text-2xl"></i></button>
+                    
+                    <!-- Botón Operar Complejo -->
+                    <div class="flex items-center bg-brand-active text-white rounded-lg shadow-sm h-full overflow-hidden">
+                        <button class="px-4 h-full font-medium hover:bg-blue-700 transition-colors text-[14px] flex items-center">
+                            Operar
+                        </button>
+                        <div class="w-px h-5 bg-white/40"></div>
+                        <button class="px-2.5 h-full hover:bg-blue-700 transition-colors flex items-center">
+                            <i class="ph ph-caret-down text-lg"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Fila 3: Balance Bar (64px) -->
-        <div class="flex items-center justify-between px-6 h-16 bg-[#f8fafc] shrink-0 border-b border-gray-100 shadow-[0_4px_6px_-6px_rgba(0,0,0,0.1)]">
-            <div class="flex items-center h-8">
-                <span class="text-[14px] font-semibold text-gray-800 mr-5 flex items-center h-full">Disponible para operar</span>
-                
-                <!-- Toggle (32px, rounded 8px) -->
-                <div class="flex items-center bg-white border border-gray-300 rounded-lg overflow-hidden text-xs font-medium p-[2px] h-full">
-                    <button class="px-3 h-full flex items-center text-gray-500 hover:bg-gray-50 rounded-md">C.I.</button>
-                    <button class="px-3 h-full flex items-center bg-blue-100/60 text-brand-active rounded-md">24h</button>
+        <!-- Fila 2: Main Nav (64px) -> Línea inferior ocupa 100%, contenido alineado a max 1792px -->
+        <div class="w-full border-b border-gray-200 shrink-0 flex justify-center">
+            <div class="flex justify-between px-6 h-16 w-full max-w-[1792px]">
+                <nav class="flex items-end h-full gap-1">
+                    <a href="#" class="relative h-12 flex flex-col justify-start group">
+                        <span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors">
+                            Inicio
+                        </span>
+                    </a>
+                    
+                    <!-- Tab Activo "Mercados" -->
+                    <a href="#" class="relative h-12 flex flex-col justify-start">
+                        <span class="h-9 px-5 flex items-center justify-center text-brand-active text-[14px] font-bold bg-[#f4f5f8] rounded-[10px]">
+                            Mercados
+                        </span>
+                        <span class="absolute -bottom-[1px] left-0 w-full h-[3px] bg-brand-active rounded-t-sm z-10"></span>
+                    </a>
+                    
+                    <a href="#" class="relative h-12 flex flex-col justify-start group">
+                        <span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors gap-1">
+                            Portafolio <i class="ph ph-caret-down text-sm"></i>
+                        </span>
+                    </a>
+                    <a href="#" class="relative h-12 flex flex-col justify-start group">
+                        <span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors">
+                            Resultados
+                        </span>
+                    </a>
+                    <a href="#" class="relative h-12 flex flex-col justify-start group">
+                        <span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors">
+                            Actividad
+                        </span>
+                    </a>
+                    <a href="#" class="relative h-12 flex flex-col justify-start group">
+                        <span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors gap-1">
+                            Cuenta <i class="ph ph-caret-down text-sm"></i>
+                        </span>
+                    </a>
+                    
+                    <!-- Tab Versiones (Dropdown) -->
+                    <div class="relative h-12 flex flex-col justify-start group">
+                        <button class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors gap-1 outline-none">
+                            Versión 0 <i class="ph ph-caret-down text-sm"></i>
+                        </button>
+                        <!-- Dropdown Menu -->
+                        <div class="absolute top-10 left-0 w-56 bg-white border border-gray-200 rounded-lg shadow-xl hidden group-hover:block z-[100] overflow-hidden">
+                            <a href="index.html" class="block px-4 py-2.5 text-[13px] text-brand-active bg-gray-50 font-medium hover:bg-gray-100 border-b border-gray-100 transition-colors">
+                                Versión 0 (Original)
+                            </a>
+                            <a href="mercados_v1.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">
+                                Versión 1 (Scroll)
+                            </a>
+                            <a href="mercados_v2.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">
+                                Versión 2 (Sticky)
+                            </a>
+                            <a href="mercados_v3.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active transition-colors">
+                                Versión 3 (Expandir card)
+                            </a>
+                        </div>
+                    </div>
+                </nav>
+                <div class="flex items-center h-full">
+                    <div class="border border-blue-600 bg-blue-50/50 rounded-full px-5 h-8 flex items-center text-[13px] text-gray-800 font-medium tracking-wide">
+                        CC 125780 | Pérez, Juan C...
+                    </div>
                 </div>
-
-                <!-- Separator -->
-                <div class="w-px h-5 bg-gray-300 mx-5"></div>
-
-                <!-- Balances -->
-                <div class="flex items-center text-[14px] h-full">
-                    <span class="text-gray-400 font-semibold text-xs mr-1.5 tracking-wider">ARS</span>
-                    <span class="font-bold text-gray-900 text-[15px]">123.456</span>
-                    <span class="text-gray-500 font-medium text-[13px]">,78</span>
-                </div>
-
-                <div class="w-px h-5 bg-gray-300 mx-5"></div>
-
-                <div class="flex items-center text-[14px] h-full">
-                    <span class="text-gray-400 font-semibold text-xs mr-1.5 tracking-wider">USD</span>
-                    <span class="font-bold text-gray-900 text-[15px]">900</span>
-                    <span class="text-gray-500 font-medium text-[13px]">,00</span>
-                </div>
-
-                <div class="w-px h-5 bg-gray-300 mx-5"></div>
-
-                <div class="flex items-center text-[14px] opacity-70 h-full">
-                    <span class="text-gray-400 font-semibold text-xs mr-1.5 tracking-wider">USD EXT</span>
-                    <span class="font-bold text-gray-700 text-[15px]">0</span>
-                    <span class="text-gray-400 font-medium text-[13px]">,00</span>
-                </div>
-
-                <div class="w-px h-5 bg-gray-300 mx-5"></div>
-
-                <a href="#" class="text-[13px] text-gray-500 hover:text-gray-800 underline underline-offset-2 decoration-gray-400 flex items-center font-medium h-full">
-                    Ver detalle <i class="ph ph-arrow-right ml-1"></i>
-                </a>
             </div>
-            
-            <a href="#" class="text-brand-active text-[14px] font-medium hover:text-blue-800 transition-colors h-8 flex items-center">Ingresar/retirar fondos</a>
+        </div>
+
+        <!-- Fila 3: Balance Bar (64px) -> Fondo gris azulado ocupa 100%, contenido centrado -->
+        <div class="w-full bg-[#f8fafc] border-b border-gray-100 shadow-[0_4px_6px_-6px_rgba(0,0,0,0.1)] shrink-0 flex justify-center">
+            <div class="flex items-center justify-between px-6 h-16 w-full max-w-[1792px]">
+                <div class="flex items-center h-8">
+                    <span class="text-[14px] font-semibold text-gray-800 mr-5 flex items-center h-full">Disponible para operar</span>
+                    
+                    <!-- Toggle -->
+                    <div class="flex items-center bg-white border border-gray-300 rounded-lg overflow-hidden text-xs font-medium p-[2px] h-full">
+                        <button class="px-3 h-full flex items-center text-gray-500 hover:bg-gray-50 rounded-md">C.I.</button>
+                        <button class="px-3 h-full flex items-center bg-blue-100/60 text-brand-active rounded-md">24h</button>
+                    </div>
+
+                    <!-- Separator -->
+                    <div class="w-px h-5 bg-gray-300 mx-5"></div>
+
+                    <!-- Balances -->
+                    <div class="flex items-center text-[14px] h-full">
+                        <span class="text-gray-400 font-semibold text-xs mr-1.5 tracking-wider">ARS</span>
+                        <span class="font-bold text-gray-900 text-[15px]">123.456</span>
+                        <span class="text-gray-500 font-medium text-[13px]">,78</span>
+                    </div>
+
+                    <div class="w-px h-5 bg-gray-300 mx-5"></div>
+
+                    <div class="flex items-center text-[14px] h-full">
+                        <span class="text-gray-400 font-semibold text-xs mr-1.5 tracking-wider">USD</span>
+                        <span class="font-bold text-gray-900 text-[15px]">900</span>
+                        <span class="text-gray-500 font-medium text-[13px]">,00</span>
+                    </div>
+
+                    <div class="w-px h-5 bg-gray-300 mx-5"></div>
+
+                    <div class="flex items-center text-[14px] opacity-70 h-full">
+                        <span class="text-gray-400 font-semibold text-xs mr-1.5 tracking-wider">USD EXT</span>
+                        <span class="font-bold text-gray-700 text-[15px]">0</span>
+                        <span class="text-gray-400 font-medium text-[13px]">,00</span>
+                    </div>
+
+                    <div class="w-px h-5 bg-gray-300 mx-5"></div>
+
+                    <a href="#" class="text-[13px] text-gray-500 hover:text-gray-800 underline underline-offset-2 decoration-gray-400 flex items-center font-medium h-full">
+                        Ver detalle <i class="ph ph-arrow-right ml-1"></i>
+                    </a>
+                </div>
+                
+                <a href="#" class="text-brand-active text-[14px] font-medium hover:text-blue-800 transition-colors h-8 flex items-center">Ingresar/retirar fondos</a>
+            </div>
         </div>
     </header>
 
@@ -529,10 +533,12 @@
         </div>
     </main>
 
-    <!-- FOOTER -->
-    <footer class="bg-brand-footer text-white py-3 px-6 flex justify-between items-center text-xs mt-auto">
-        <span class="text-blue-200">Versión: 3.18.3</span>
-        <span class="text-blue-200">Una creación de <strong class="text-white">Gallo Financial Technology</strong></span>
+    <!-- FOOTER -> Ocupa 100%, contenido centrado -->
+    <footer class="bg-brand-footer text-white mt-auto w-full flex justify-center">
+        <div class="flex justify-between items-center w-full max-w-[1792px] py-3 px-6 text-xs">
+            <span class="text-blue-200">Versión: 3.18.3</span>
+            <span class="text-blue-200">Una creación de <strong class="text-white">Gallo Financial Technology</strong></span>
+        </div>
     </footer>
 
 </body>
