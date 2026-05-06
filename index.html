@@ -53,6 +53,7 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            min-width: 1200px;
         }
 
         /* 1. Header completo 192px fijo */
@@ -60,6 +61,10 @@
             position: sticky;
             top: 0;
             z-index: 50;
+            width: 100%;
+            min-width: 1200px;
+            max-width: 1792px;
+            margin: 0 auto;
             height: var(--header-height);
             min-height: var(--header-height);
             max-height: var(--header-height);
@@ -179,9 +184,10 @@
         .main-content-wrapper {
             flex-grow: 1;
             padding: 1rem;
-            max-width: 1400px;
-            margin: 0 auto;
             width: 100%;
+            min-width: 1200px;
+            max-width: 1792px;
+            margin: 0 auto;
             display: flex;
             flex-direction: column;
         }
