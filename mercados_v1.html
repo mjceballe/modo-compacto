@@ -14,13 +14,13 @@
                 extend: {
                     colors: {
                         brand: {
-                            blue: '#1e3a8a', // Gallo dark blue
-                            active: '#3557D4', // Gallo main blue
-                            bg: '#f3f4f6', // Main background
+                            blue: '#1e3a8a',
+                            active: '#3557D4',
+                            bg: '#f3f4f6',
                             card: '#ffffff',
                             footer: '#2e386e',
-                            venderBg: '#f4f5f8', // Gris claro celdas vender
-                            comprarBg: '#eaecef', // Gris oscuro celdas comprar
+                            venderBg: '#f4f5f8',
+                            comprarBg: '#eaecef',
                             headerBg: '#f1f4f9',
                             headerVenderBg: '#e2e8f0',
                             headerComprarBg: '#cbd5e1',
@@ -36,7 +36,6 @@
         }
     </script>
     <style>
-        /* Estilos base con variables adaptativas para scroll */
         :root {
             --header-height: 192px;
             --title-height: 92px;
@@ -45,12 +44,10 @@
             --thead-bottom: 32px;
         }
 
-        /* Estilos modificados cuando el body tiene la clase 'scrolled' */
         body.scrolled {
             --header-height: 64px;
         }
 
-        /* Desactivamos el scroll anchoring nativo para evitar saltos bruscos */
         html, body {
             overflow-anchor: none;
         }
@@ -63,15 +60,16 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            min-width: 1200px;
         }
 
-        /* 1. Header dinámico */
         .fixed-header {
             position: -webkit-sticky;
             position: sticky;
             top: 0;
             z-index: 50;
             width: 100%;
+            min-width: 1200px;
             height: var(--header-height);
             min-height: var(--header-height);
             max-height: var(--header-height);
@@ -89,13 +87,12 @@
             border-bottom-color: transparent;
         }
 
-        /* Filas colapsables al hacer scroll */
         .collapsible-row {
             height: 64px;
             min-height: 64px;
             max-height: 64px;
             transition: height 0.3s ease, min-height 0.3s ease, max-height 0.3s ease, opacity 0.2s ease, border-width 0.3s ease;
-            overflow: visible; /* Dropdowns se ven bien */
+            overflow: visible;
         }
         
         body.scrolled .collapsible-row {
@@ -104,17 +101,15 @@
             max-height: 0 !important;
             opacity: 0;
             border-width: 0 !important;
-            overflow: hidden !important; /* Oculta su contenido al achicarse */
+            overflow: hidden !important;
         }
 
-        /* Visibilidad selectiva en scroll */
         .hide-on-scroll { transition: opacity 0.2s ease; }
         body.scrolled .hide-on-scroll { display: none !important; }
         
         .scrolled-show { display: none !important; }
         body.scrolled .scrolled-show { display: flex !important; }
 
-        /* Transformación del logo */
         .logo-wrapper {
             transition: transform 0.3s ease;
             transform-origin: left center;
@@ -123,7 +118,6 @@
             transform: scale(0.8);
         }
 
-        /* 2. Card Title (Flujo Normal, no se reduce) */
         .fixed-title-card {
             position: relative;
             z-index: 40;
@@ -142,7 +136,6 @@
             flex-shrink: 0;
         }
 
-        /* 3. Filas de tabla y cabeceras dinámicas */
         .data-table tbody tr {
             height: var(--row-height);
             min-height: var(--row-height);
@@ -185,215 +178,186 @@
         .table-scroll-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .table-scroll-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        /* CONTENEDOR PRINCIPAL - Modificado con compensación de altura */
         .main-content-wrapper {
             flex-grow: 1;
-            padding: 1rem; /* Base padding */
-            max-width: 1400px;
-            margin: 0 auto;
+            padding: 1rem;
             width: 100%;
+            min-width: 1200px;
+            max-width: 1792px;
+            margin: 0 auto;
             display: flex;
             flex-direction: column;
-            transition: padding-top 0.3s ease; /* Transición fluida sincronizada con el header */
         }
-
-        /* Cuando el header pierde 128px (de 192px a 64px), el contenedor suma 128px para que la tarjeta no salte */
-        body.scrolled .main-content-wrapper {
-            padding-top: calc(1rem + 128px); 
-        }
-
     </style>
 </head>
 <body class="text-text-main text-sm">
 
-    <!-- HEADER DINÁMICO -->
     <header class="fixed-header">
         <!-- Fila 1: Top Nav (64px) -->
-        <div class="flex items-center justify-between px-6 h-16 shrink-0">
-            <div class="flex items-center h-8 gap-4">
-                <!-- Logo SVG -->
-                <div class="flex items-center h-full logo-wrapper">
-                    <svg width="146" height="40" viewBox="0 0 146 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M30.1484 9.50942H6.05986C5.96528 9.50942 5.87296 9.54503 5.8054 9.60787L0.105839 14.9098C0.0382823 14.9726 0 15.0585 0 15.1465V20.3688C0 20.4568 0.0382823 20.5427 0.105839 20.6055L5.80765 25.9095C5.87521 25.9724 5.96754 26.008 6.06212 26.008H26.9778C27.1759 26.008 27.3381 25.8593 27.3381 25.6728V20.8443C27.3381 20.66 27.1759 20.5092 26.9778 20.5092H6.27154C6.07338 20.5092 5.91124 20.3604 5.91124 20.174V15.3434C5.91124 15.1591 6.07112 15.0082 6.27154 15.0082H29.9368C30.1349 15.0082 30.2971 15.1591 30.2971 15.3434V30.1641C30.2971 30.3484 30.1349 30.4992 29.9368 30.4992H10.8632C10.7686 30.4992 10.6763 30.5348 10.6087 30.5977L5.41807 35.4283C5.19063 35.6398 5.35277 36.0001 5.67254 36.0001H30.1507C30.2453 36.0001 30.3376 35.9645 30.4052 35.9017L36.1047 30.5977C36.1723 30.5348 36.2106 30.449 36.2106 30.361V15.1465C36.2106 15.0585 36.1723 14.9726 36.1047 14.9098L30.4052 9.60578C30.3376 9.54294 30.2453 9.50732 30.1507 9.50732" fill="#3557D4"/>
-                        <path d="M77.0009 20.1719V15.1465C77.0009 15.0585 76.9626 14.9726 76.8951 14.9098L71.1932 9.60578C71.1257 9.54294 71.0334 9.50732 70.9388 9.50732H46.8502C46.7556 9.50732 46.6633 9.54294 46.5957 9.60578L40.8939 14.9098C40.8264 14.9726 40.7881 15.0585 40.7881 15.1465V20.3688C40.7881 20.4568 40.8264 20.5427 40.8939 20.6055L46.5957 25.9095C46.6633 25.9724 46.7556 26.008 46.8502 26.008H79.9441C80.1423 26.008 80.3044 25.8572 80.3044 25.6728V20.8443C80.3044 20.66 80.1423 20.5092 79.9441 20.5092H77.359C77.1608 20.5092 76.9986 20.3583 76.9986 20.174M70.7271 20.5092H47.0619C46.8637 20.5092 46.7016 20.3583 46.7016 20.174V15.3455C46.7016 15.1612 46.8637 15.0103 47.0619 15.0103H70.7271C70.9253 15.0103 71.0874 15.1612 71.0874 15.3455V20.174C71.0874 20.3583 70.9253 20.5092 70.7271 20.5092Z" fill="#3557D4"/>
-                        <path d="M145.449 14.9098L139.747 9.60578C139.68 9.54294 139.587 9.50732 139.493 9.50732H118.573C118.375 9.50732 118.212 9.65815 118.212 9.84249V14.671C118.212 14.8553 118.375 15.0062 118.573 15.0062H139.283C139.482 15.0062 139.644 15.157 139.644 15.3413V20.1719C139.644 20.3562 139.482 20.5071 139.283 20.5071H115.618C115.42 20.5071 115.258 20.3562 115.258 20.1719V10.318C115.258 10.0205 114.871 9.86972 114.643 10.0813L109.453 14.9098C109.385 14.9726 109.347 15.0585 109.347 15.1465V20.3688C109.347 20.4568 109.385 20.5427 109.453 20.6055L115.154 25.9095C115.222 25.9724 115.314 26.008 115.409 26.008H139.497C139.592 26.008 139.684 25.9724 139.752 25.9095L145.454 20.6055C145.521 20.5427 145.559 20.4568 145.559 20.3688V15.1465C145.559 15.0585 145.521 14.9726 145.454 14.9098" fill="#3557D4"/>
-                        <path d="M85.3415 4H82.7451C82.5469 4 82.3848 4.15082 82.3848 4.33517V9.13643C82.3848 9.32077 82.5469 9.47159 82.7451 9.47159H84.9812C85.1794 9.47159 85.3415 9.62242 85.3415 9.80676V25.6727C85.3415 25.8571 85.5036 26.0079 85.7018 26.0079H90.8924C91.0906 26.0079 91.2528 25.8571 91.2528 25.6727V4.33517C91.2528 4.15082 91.0929 4 90.8924 4H85.3415Z" fill="#3557D4"/>
-                        <path d="M98.8044 4H96.208C96.0098 4 95.8477 4.15082 95.8477 4.33517V9.13643C95.8477 9.32077 96.0098 9.47159 96.208 9.47159H98.4441C98.6423 9.47159 98.8044 9.62242 98.8044 9.80676V25.6727C98.8044 25.8571 98.9665 26.0079 99.1647 26.0079H104.355C104.554 26.0079 104.716 25.8571 104.716 25.6727V4.33517C104.716 4.15082 104.556 4 104.355 4H98.8044Z" fill="#3557D4"/>
-                    </svg>
+        <div class="w-full shrink-0 flex justify-center">
+            <div class="flex items-center justify-between px-6 h-16 w-full max-w-[1792px]">
+                <div class="flex items-center h-8 gap-4">
+                    <div class="flex items-center h-full logo-wrapper">
+                        <svg width="146" height="40" viewBox="0 0 146 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M30.1484 9.50942H6.05986C5.96528 9.50942 5.87296 9.54503 5.8054 9.60787L0.105839 14.9098C0.0382823 14.9726 0 15.0585 0 15.1465V20.3688C0 20.4568 0.0382823 20.5427 0.105839 20.6055L5.80765 25.9095C5.87521 25.9724 5.96754 26.008 6.06212 26.008H26.9778C27.1759 26.008 27.3381 25.8593 27.3381 25.6728V20.8443C27.3381 20.66 27.1759 20.5092 26.9778 20.5092H6.27154C6.07338 20.5092 5.91124 20.3604 5.91124 20.174V15.3434C5.91124 15.1591 6.07112 15.0082 6.27154 15.0082H29.9368C30.1349 15.0082 30.2971 15.1591 30.2971 15.3434V30.1641C30.2971 30.3484 30.1349 30.4992 29.9368 30.4992H10.8632C10.7686 30.4992 10.6763 30.5348 10.6087 30.5977L5.41807 35.4283C5.19063 35.6398 5.35277 36.0001 5.67254 36.0001H30.1507C30.2453 36.0001 30.3376 35.9645 30.4052 35.9017L36.1047 30.5977C36.1723 30.5348 36.2106 30.449 36.2106 30.361V15.1465C36.2106 15.0585 36.1723 14.9726 36.1047 14.9098L30.4052 9.60578C30.3376 9.54294 30.2453 9.50732 30.1507 9.50732" fill="#3557D4"/>
+                            <path d="M77.0009 20.1719V15.1465C77.0009 15.0585 76.9626 14.9726 76.8951 14.9098L71.1932 9.60578C71.1257 9.54294 71.0334 9.50732 70.9388 9.50732H46.8502C46.7556 9.50732 46.6633 9.54294 46.5957 9.60578L40.8939 14.9098C40.8264 14.9726 40.7881 15.0585 40.7881 15.1465V20.3688C40.7881 20.4568 40.8264 20.5427 40.8939 20.6055L46.5957 25.9095C46.6633 25.9724 46.7556 26.008 46.8502 26.008H79.9441C80.1423 26.008 80.3044 25.8572 80.3044 25.6728V20.8443C80.3044 20.66 80.1423 20.5092 79.9441 20.5092H77.359C77.1608 20.5092 76.9986 20.3583 76.9986 20.174M70.7271 20.5092H47.0619C46.8637 20.5092 46.7016 20.3583 46.7016 20.174V15.3455C46.7016 15.1612 46.8637 15.0103 47.0619 15.0103H70.7271C70.9253 15.0103 71.0874 15.1612 71.0874 15.3455V20.174C71.0874 20.3583 70.9253 20.5092 70.7271 20.5092Z" fill="#3557D4"/>
+                            <path d="M145.449 14.9098L139.747 9.60578C139.68 9.54294 139.587 9.50732 139.493 9.50732H118.573C118.375 9.50732 118.212 9.65815 118.212 9.84249V14.671C118.212 14.8553 118.375 15.0062 118.573 15.0062H139.283C139.482 15.0062 139.644 15.157 139.644 15.3413V20.1719C139.644 20.3562 139.482 20.5071 139.283 20.5071H115.618C115.42 20.5071 115.258 20.3562 115.258 20.1719V10.318C115.258 10.0205 114.871 9.86972 114.643 10.0813L109.453 14.9098C109.385 14.9726 109.347 15.0585 109.347 15.1465V20.3688C109.347 20.4568 109.385 20.5427 109.453 20.6055L115.154 25.9095C115.222 25.9724 115.314 26.008 115.409 26.008H139.497C139.592 26.008 139.684 25.9724 139.752 25.9095L145.454 20.6055C145.521 20.5427 145.559 20.4568 145.559 20.3688V15.1465C145.559 15.0585 145.521 14.9726 145.454 14.9098" fill="#3557D4"/>
+                            <path d="M85.3415 4H82.7451C82.5469 4 82.3848 4.15082 82.3848 4.33517V9.13643C82.3848 9.32077 82.5469 9.47159 82.7451 9.47159H84.9812C85.1794 9.47159 85.3415 9.62242 85.3415 9.80676V25.6727C85.3415 25.8571 85.5036 26.0079 85.7018 26.0079H90.8924C91.0906 26.0079 91.2528 25.8571 91.2528 25.6727V4.33517C91.2528 4.15082 91.0929 4 90.8924 4H85.3415Z" fill="#3557D4"/>
+                            <path d="M98.8044 4H96.208C96.0098 4 95.8477 4.15082 95.8477 4.33517V9.13643C95.8477 9.32077 96.0098 9.47159 96.208 9.47159H98.4441C98.6423 9.47159 98.8044 9.62242 98.8044 9.80676V25.6727C98.8044 25.8571 98.9665 26.0079 99.1647 26.0079H104.355C104.554 26.0079 104.716 25.8571 104.716 25.6727V4.33517C104.716 4.15082 104.556 4 104.355 4H98.8044Z" fill="#3557D4"/>
+                        </svg>
+                    </div>
+                    <button class="scrolled-show text-gray-400 hover:text-gray-800 transition-colors items-center justify-center">
+                        <i class="ph ph-dots-three text-2xl"></i>
+                    </button>
                 </div>
-                <!-- Puntos de breadcrumb visible en scroll -->
-                <button class="scrolled-show text-gray-400 hover:text-gray-800 transition-colors items-center justify-center">
-                    <i class="ph ph-dots-three text-2xl"></i>
-                </button>
-            </div>
-            
-            <!-- Barra de Búsqueda (Flexible) -->
-            <div class="flex-1 max-w-[600px] mx-4 lg:mx-8 relative flex items-center h-8">
-                <i class="ph ph-magnifying-glass absolute left-4 text-gray-500 text-lg font-bold"></i>
-                <input type="text" placeholder="Buscá un instrumento" class="w-full h-full pl-11 pr-4 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:border-brand-active focus:ring-1 focus:ring-brand-active">
-            </div>
-
-            <!-- Acciones Derecha -->
-            <div class="flex items-center gap-2 h-8">
-                <button class="hide-on-scroll text-gray-600 hover:text-gray-900 transition-colors flex items-center justify-center h-full w-8"><i class="ph ph-question text-2xl"></i></button>
-                <button class="text-gray-600 hover:text-gray-900 transition-colors relative flex items-center justify-center h-full w-8">
-                    <i class="ph ph-bell text-2xl"></i>
-                    <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
-                </button>
-                <button class="hide-on-scroll text-gray-600 hover:text-gray-900 transition-colors flex items-center justify-center h-full w-8"><i class="ph ph-wallet text-2xl"></i></button>
-                <button class="text-gray-600 hover:text-gray-900 transition-colors flex items-center justify-center h-full w-8"><i class="ph ph-user-circle text-2xl"></i></button>
                 
-                <!-- Píldora de Cuenta Clonada (Visible en Scroll) -->
-                <div class="scrolled-show items-center h-full ml-1 mr-1">
-                    <div class="border border-blue-600 bg-blue-50/50 rounded-full px-4 h-8 flex items-center text-[12px] text-gray-800 font-medium tracking-wide whitespace-nowrap">
+                <div class="flex-1 max-w-[600px] mx-4 lg:mx-8 relative flex items-center h-8">
+                    <i class="ph ph-magnifying-glass absolute left-4 text-gray-500 text-lg font-bold"></i>
+                    <input type="text" placeholder="Buscá un instrumento" class="w-full h-full pl-11 pr-4 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:border-brand-active focus:ring-1 focus:ring-brand-active">
+                </div>
+
+                <div class="flex items-center gap-2 h-8">
+                    <button class="hide-on-scroll text-gray-600 hover:text-gray-900 transition-colors flex items-center justify-center h-full w-8"><i class="ph ph-question text-2xl"></i></button>
+                    <button class="text-gray-600 hover:text-gray-900 transition-colors relative flex items-center justify-center h-full w-8">
+                        <i class="ph ph-bell text-2xl"></i>
+                        <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+                    </button>
+                    <button class="hide-on-scroll text-gray-600 hover:text-gray-900 transition-colors flex items-center justify-center h-full w-8"><i class="ph ph-wallet text-2xl"></i></button>
+                    <button class="text-gray-600 hover:text-gray-900 transition-colors flex items-center justify-center h-full w-8"><i class="ph ph-user-circle text-2xl"></i></button>
+                    
+                    <div class="scrolled-show items-center h-full ml-1 mr-1">
+                        <div class="border border-blue-600 bg-blue-50/50 rounded-full px-4 h-8 flex items-center text-[12px] text-gray-800 font-medium tracking-wide whitespace-nowrap">
+                            CC 125780 | Pérez, Juan C...
+                        </div>
+                    </div>
+
+                    <div class="flex items-center bg-brand-active text-white rounded-lg shadow-sm h-full overflow-hidden">
+                        <button class="px-4 h-full font-medium hover:bg-blue-700 transition-colors text-[14px] flex items-center">
+                            Operar
+                        </button>
+                        <div class="w-px h-5 bg-white/40"></div>
+                        <button class="px-2.5 h-full hover:bg-blue-700 transition-colors flex items-center">
+                            <i class="ph ph-caret-down text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fila 2: Main Nav (64px) -->
+        <div class="collapsible-row w-full border-b border-gray-200 shrink-0 flex justify-center">
+            <div class="flex justify-between px-6 h-16 w-full max-w-[1792px]">
+                <nav class="flex items-end h-full gap-1">
+                    <a href="#" class="relative h-12 flex flex-col justify-start group">
+                        <span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors">
+                            Inicio
+                        </span>
+                    </a>
+                    <a href="#" class="relative h-12 flex flex-col justify-start">
+                        <span class="h-9 px-5 flex items-center justify-center text-brand-active text-[14px] font-bold bg-[#f4f5f8] rounded-[10px]">
+                            Mercados
+                        </span>
+                        <span class="absolute -bottom-[1px] left-0 w-full h-[3px] bg-brand-active rounded-t-sm z-10"></span>
+                    </a>
+                    <a href="#" class="relative h-12 flex flex-col justify-start group">
+                        <span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors gap-1">
+                            Portafolio <i class="ph ph-caret-down text-sm"></i>
+                        </span>
+                    </a>
+                    <a href="#" class="relative h-12 flex flex-col justify-start group">
+                        <span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors">
+                            Resultados
+                        </span>
+                    </a>
+                    <a href="#" class="relative h-12 flex flex-col justify-start group">
+                        <span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors">
+                            Actividad
+                        </span>
+                    </a>
+                    <a href="#" class="relative h-12 flex flex-col justify-start group">
+                        <span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors gap-1">
+                            Cuenta <i class="ph ph-caret-down text-sm"></i>
+                        </span>
+                    </a>
+                    
+                    <!-- Tab Versiones (Dropdown) -->
+                    <div class="relative h-12 flex flex-col justify-start group">
+                        <button class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors gap-1 outline-none">
+                            Versión 1 <i class="ph ph-caret-down text-sm"></i>
+                        </button>
+                        <div class="absolute top-10 left-0 w-56 bg-white border border-gray-200 rounded-lg shadow-xl hidden group-hover:block z-[100] overflow-hidden">
+                            <a href="index.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">
+                                Versión 0 (Original)
+                            </a>
+                            <a href="mercados_v1.html" class="block px-4 py-2.5 text-[13px] text-brand-active bg-gray-50 font-medium hover:bg-gray-100 transition-colors border-b border-gray-100">
+                                Versión 1 (Scroll)
+                            </a>
+                            <a href="mercados_v2.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">
+                                Versión 2 (Sticky)
+                            </a>
+                            <a href="mercados_v3.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active transition-colors">
+                                Versión 3 (Expandir card)
+                            </a>
+                        </div>
+                    </div>
+                </nav>
+                <div class="flex items-center h-full hide-on-scroll">
+                    <div class="border border-blue-600 bg-blue-50/50 rounded-full px-5 h-8 flex items-center text-[13px] text-gray-800 font-medium tracking-wide">
                         CC 125780 | Pérez, Juan C...
                     </div>
                 </div>
-
-                <!-- Botón Operar Complejo -->
-                <div class="flex items-center bg-brand-active text-white rounded-lg shadow-sm h-full overflow-hidden">
-                    <button class="px-4 h-full font-medium hover:bg-blue-700 transition-colors text-[14px] flex items-center">
-                        Operar
-                    </button>
-                    <div class="w-px h-5 bg-white/40"></div>
-                    <button class="px-2.5 h-full hover:bg-blue-700 transition-colors flex items-center">
-                        <i class="ph ph-caret-down text-lg"></i>
-                    </button>
-                </div>
             </div>
         </div>
 
-        <!-- Fila 2: Main Nav (Colapsa en scroll) -->
-        <div class="collapsible-row flex justify-between px-6 border-b border-gray-200 shrink-0">
-            <nav class="flex items-end h-full gap-1">
-                <a href="#" class="relative h-12 flex flex-col justify-start group">
-                    <span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors">
-                        Inicio
-                    </span>
-                </a>
-                
-                <!-- Tab Activo -->
-                <a href="#" class="relative h-12 flex flex-col justify-start">
-                    <span class="h-9 px-5 flex items-center justify-center text-brand-active text-[14px] font-bold bg-[#f4f5f8] rounded-[10px]">
-                        Mercados
-                    </span>
-                    <span class="absolute -bottom-[1px] left-0 w-full h-[3px] bg-brand-active rounded-t-sm z-10"></span>
-                </a>
-                
-                <a href="#" class="relative h-12 flex flex-col justify-start group">
-                    <span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors gap-1">
-                        Portafolio <i class="ph ph-caret-down text-sm"></i>
-                    </span>
-                </a>
-                <a href="#" class="relative h-12 flex flex-col justify-start group">
-                    <span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors">
-                        Resultados
-                    </span>
-                </a>
-                <a href="#" class="relative h-12 flex flex-col justify-start group">
-                    <span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors">
-                        Actividad
-                    </span>
-                </a>
-                <a href="#" class="relative h-12 flex flex-col justify-start group">
-                    <span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors gap-1">
-                        Cuenta <i class="ph ph-caret-down text-sm"></i>
-                    </span>
-                </a>
-                
-                <!-- Tab Versiones (Dropdown) -->
-                <div class="relative h-12 flex flex-col justify-start group">
-                    <button class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors gap-1 outline-none">
-                        Versión 1 <i class="ph ph-caret-down text-sm"></i>
-                    </button>
-                    <!-- Dropdown Menu -->
-                    <div class="absolute top-10 left-0 w-56 bg-white border border-gray-200 rounded-lg shadow-xl hidden group-hover:block z-[100] overflow-hidden">
-                        <a href="index.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">
-                            Versión 0 (Original)
-                        </a>
-                        <a href="mercados_v1.html" class="block px-4 py-2.5 text-[13px] text-brand-active bg-gray-50 font-medium hover:bg-gray-100 transition-colors border-b border-gray-100">
-                            Versión 1 (Scroll)
-                        </a>
-                        <a href="mercados_v2.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">
-                            Versión 2 (Sticky)
-                        </a>
-                        <a href="mercados_v3.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active transition-colors">
-                            Versión 3 (Expandir card)
-                        </a>
+        <!-- Fila 3: Balance Bar (64px) -->
+        <div class="collapsible-row w-full bg-[#f8fafc] border-b border-gray-100 shadow-[0_4px_6px_-6px_rgba(0,0,0,0.1)] shrink-0 flex justify-center">
+            <div class="flex items-center justify-between px-6 h-16 w-full max-w-[1792px]">
+                <div class="flex items-center h-8">
+                    <span class="text-[14px] font-semibold text-gray-800 mr-5 flex items-center h-full">Disponible para operar</span>
+                    <div class="flex items-center bg-white border border-gray-300 rounded-lg overflow-hidden text-xs font-medium p-[2px] h-full">
+                        <button class="px-3 h-full flex items-center text-gray-500 hover:bg-gray-50 rounded-md">C.I.</button>
+                        <button class="px-3 h-full flex items-center bg-blue-100/60 text-brand-active rounded-md">24h</button>
                     </div>
+                    <div class="w-px h-5 bg-gray-300 mx-5"></div>
+                    <div class="flex items-center text-[14px] h-full">
+                        <span class="text-gray-400 font-semibold text-xs mr-1.5 tracking-wider">ARS</span>
+                        <span class="font-bold text-gray-900 text-[15px]">123.456</span>
+                        <span class="text-gray-500 font-medium text-[13px]">,78</span>
+                    </div>
+                    <div class="w-px h-5 bg-gray-300 mx-5"></div>
+                    <div class="flex items-center text-[14px] h-full">
+                        <span class="text-gray-400 font-semibold text-xs mr-1.5 tracking-wider">USD</span>
+                        <span class="font-bold text-gray-900 text-[15px]">900</span>
+                        <span class="text-gray-500 font-medium text-[13px]">,00</span>
+                    </div>
+                    <div class="w-px h-5 bg-gray-300 mx-5"></div>
+                    <div class="flex items-center text-[14px] opacity-70 h-full">
+                        <span class="text-gray-400 font-semibold text-xs mr-1.5 tracking-wider">USD EXT</span>
+                        <span class="font-bold text-gray-700 text-[15px]">0</span>
+                        <span class="text-gray-400 font-medium text-[13px]">,00</span>
+                    </div>
+                    <div class="w-px h-5 bg-gray-300 mx-5"></div>
+                    <a href="#" class="text-[13px] text-gray-500 hover:text-gray-800 underline underline-offset-2 decoration-gray-400 flex items-center font-medium h-full">
+                        Ver detalle <i class="ph ph-arrow-right ml-1"></i>
+                    </a>
                 </div>
-            </nav>
-            <div class="flex items-center h-full hide-on-scroll">
-                <!-- Píldora de cuenta original -->
-                <div class="border border-blue-600 bg-blue-50/50 rounded-full px-5 h-8 flex items-center text-[13px] text-gray-800 font-medium tracking-wide">
-                    CC 125780 | Pérez, Juan C...
-                </div>
+                <a href="#" class="text-brand-active text-[14px] font-medium hover:text-blue-800 transition-colors h-8 flex items-center">Ingresar/retirar fondos</a>
             </div>
-        </div>
-
-        <!-- Fila 3: Balance Bar (Colapsa en scroll) -->
-        <div class="collapsible-row flex items-center justify-between px-6 bg-[#f8fafc] shrink-0 border-b border-gray-100 shadow-[0_4px_6px_-6px_rgba(0,0,0,0.1)]">
-            <div class="flex items-center h-8">
-                <span class="text-[14px] font-semibold text-gray-800 mr-5 flex items-center h-full">Disponible para operar</span>
-                
-                <div class="flex items-center bg-white border border-gray-300 rounded-lg overflow-hidden text-xs font-medium p-[2px] h-full">
-                    <button class="px-3 h-full flex items-center text-gray-500 hover:bg-gray-50 rounded-md">C.I.</button>
-                    <button class="px-3 h-full flex items-center bg-blue-100/60 text-brand-active rounded-md">24h</button>
-                </div>
-
-                <div class="w-px h-5 bg-gray-300 mx-5"></div>
-
-                <div class="flex items-center text-[14px] h-full">
-                    <span class="text-gray-400 font-semibold text-xs mr-1.5 tracking-wider">ARS</span>
-                    <span class="font-bold text-gray-900 text-[15px]">123.456</span>
-                    <span class="text-gray-500 font-medium text-[13px]">,78</span>
-                </div>
-
-                <div class="w-px h-5 bg-gray-300 mx-5"></div>
-
-                <div class="flex items-center text-[14px] h-full">
-                    <span class="text-gray-400 font-semibold text-xs mr-1.5 tracking-wider">USD</span>
-                    <span class="font-bold text-gray-900 text-[15px]">900</span>
-                    <span class="text-gray-500 font-medium text-[13px]">,00</span>
-                </div>
-
-                <div class="w-px h-5 bg-gray-300 mx-5"></div>
-
-                <div class="flex items-center text-[14px] opacity-70 h-full">
-                    <span class="text-gray-400 font-semibold text-xs mr-1.5 tracking-wider">USD EXT</span>
-                    <span class="font-bold text-gray-700 text-[15px]">0</span>
-                    <span class="text-gray-400 font-medium text-[13px]">,00</span>
-                </div>
-
-                <div class="w-px h-5 bg-gray-300 mx-5"></div>
-
-                <a href="#" class="text-[13px] text-gray-500 hover:text-gray-800 underline underline-offset-2 decoration-gray-400 flex items-center font-medium h-full">
-                    Ver detalle <i class="ph ph-arrow-right ml-1"></i>
-                </a>
-            </div>
-            
-            <a href="#" class="text-brand-active text-[14px] font-medium hover:text-blue-800 transition-colors h-8 flex items-center">Ingresar/retirar fondos</a>
         </div>
     </header>
 
-    <!-- MAIN CONTENT -->
     <main class="main-content-wrapper">
-        
-        <!-- CARD TITLE (Flujo normal) -->
         <div class="fixed-title-card">
-            <div class="title-breadcrumbs flex items-center text-xs text-brand-active mb-1 gap-1">
+            <div class="flex items-center text-xs text-brand-active mb-1 gap-1">
                 <i class="ph ph-house"></i>
                 <a href="#" class="hover:underline">Inicio</a>
                 <i class="ph ph-caret-right text-gray-400 text-[10px]"></i>
                 <span class="text-gray-500">Mercados</span>
             </div>
-            <h1 class="title-h1 text-2xl font-bold text-gray-800">Mercados</h1>
+            <h1 class="text-2xl font-bold text-gray-800">Mercados</h1>
         </div>
 
-        <!-- MAIN DATA CARD -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col flex-grow overflow-hidden">
-            
-            <!-- Primary Tabs -->
             <div class="flex px-4 border-b border-gray-200 shrink-0">
                 <button class="px-4 py-3 text-brand-active font-medium border-b-2 border-brand-active text-sm">BYMA</button>
                 <button class="px-4 py-3 text-gray-500 hover:text-gray-800 font-medium text-sm">A3</button>
@@ -401,8 +365,6 @@
                 <button class="px-4 py-3 text-gray-500 hover:text-gray-800 font-medium text-sm flex items-center gap-1"><i class="ph ph-star"></i> Favoritos</button>
                 <button class="px-4 py-3 text-gray-500 hover:text-gray-800 font-medium text-sm flex items-center gap-1"><i class="ph ph-thumbs-up"></i> Recomendados</button>
             </div>
-
-            <!-- Secondary Tabs (Pills) -->
             <div class="px-4 mt-4 flex gap-2 overflow-x-auto shrink-0">
                 <button class="px-4 py-1.5 bg-blue-50 text-brand-active rounded-full text-xs font-medium border border-blue-200">Líderes</button>
                 <button class="px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">General</button>
@@ -416,43 +378,25 @@
                 <button class="px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">Índices</button>
                 <button class="px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">Futuros</button>
             </div>
-
-            <!-- Filters Bar -->
             <div class="px-4 mt-4 flex items-center justify-between shrink-0">
                 <div class="flex items-center gap-3">
                     <div class="relative w-64">
                         <i class="ph ph-magnifying-glass absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                         <input type="text" placeholder="Buscá especie o descripción" class="w-full pl-8 pr-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-brand-active">
                     </div>
-                    
-                    <button class="border border-brand-active text-brand-active bg-blue-50 px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 font-medium">
-                        Plazo: 24h <i class="ph ph-caret-down"></i>
-                    </button>
-                    
-                    <button class="border border-gray-300 text-gray-600 bg-white px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 hover:bg-gray-50">
-                        Variación <i class="ph ph-caret-down"></i>
-                    </button>
-
-                    <button class="border border-gray-300 text-gray-600 bg-white px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 hover:bg-gray-50">
-                        Moneda <i class="ph ph-caret-down"></i>
-                    </button>
-
+                    <button class="border border-brand-active text-brand-active bg-blue-50 px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 font-medium">Plazo: 24h <i class="ph ph-caret-down"></i></button>
+                    <button class="border border-gray-300 text-gray-600 bg-white px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 hover:bg-gray-50">Variación <i class="ph ph-caret-down"></i></button>
+                    <button class="border border-gray-300 text-gray-600 bg-white px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 hover:bg-gray-50">Moneda <i class="ph ph-caret-down"></i></button>
                     <label class="flex items-center gap-2 cursor-pointer ml-2">
                         <input type="checkbox" class="rounded border-gray-300 text-brand-active focus:ring-brand-active w-4 h-4">
                         <span class="text-xs text-gray-600">Mostrar solo operados</span>
                         <i class="ph ph-info text-gray-400"></i>
                     </label>
                 </div>
-                
-                <button class="text-gray-500 hover:text-gray-700">
-                    <i class="ph ph-download-simple text-lg"></i>
-                </button>
+                <button class="text-gray-500 hover:text-gray-700"><i class="ph ph-download-simple text-lg"></i></button>
             </div>
-
-            <!-- Table Area -->
             <div class="px-4 mt-4 mb-4 overflow-x-auto table-scroll-container flex-grow">
                 <table class="w-full data-table text-[11px] text-right">
-                    <!-- Complex Header -->
                     <thead class="sticky top-0 z-10 text-gray-700 shadow-sm">
                         <tr>
                             <th colspan="6" class="bg-brand-headerBg"></th>
@@ -491,21 +435,15 @@
                                 { esp: 'CRES', plazo: '24h', ult: '23.456,78', var: 2.12, cc: '65.432', pc: '23.456,78', pv: '25.755,43', cv: '72.456', hora: '12:45:29', fav: true },
                                 { esp: 'LOMA', plazo: '24h', ult: '87.654,32', var: 2.12, cc: '45.678', pc: '87.654,32', pv: '87.652,34', cv: '49.876', hora: '12:45:29', fav: false },
                             ];
-
-                            // Repetimos datos suficientes para generar scroll natural en la tabla interna
                             const fullData = [...data, ...data, ...data, ...data, ...data, ...data, ...data, ...data];
-
                             fullData.forEach((row, i) => {
                                 const isPos = row.var > 0;
                                 const varClass = isPos ? 'variation-pos' : 'variation-neg';
                                 const varIcon = isPos ? 'ph-arrow-up' : 'ph-arrow-down';
                                 const showPlazoArrow = (i % 2 === 0);
-                                const arrowIndic = showPlazoArrow 
-                                    ? (isPos ? '<i class="ph ph-arrow-up text-green-500 font-bold ml-1"></i>' : '<i class="ph ph-arrow-down text-red-500 font-bold ml-1"></i>')
-                                    : '';
+                                const arrowIndic = showPlazoArrow ? (isPos ? '<i class="ph ph-arrow-up text-green-500 font-bold ml-1"></i>' : '<i class="ph ph-arrow-down text-red-500 font-bold ml-1"></i>') : '';
                                 const starClass = row.fav ? 'ph-star text-brand-active fill-current' : 'ph-star text-gray-300';
                                 const starWeight = row.fav ? 'weight="fill"' : '';
-
                                 document.write(`
                                     <tr class="bg-white">
                                         <td class="px-2 text-center text-gray-300"><i class="ph ph-dots-six-vertical cursor-grab"></i></td>
@@ -534,13 +472,13 @@
         </div>
     </main>
 
-    <!-- FOOTER -->
-    <footer class="bg-brand-footer text-white py-3 px-6 flex justify-between items-center text-xs mt-8">
-        <span class="text-blue-200">Versión: 3.18.3</span>
-        <span class="text-blue-200">Una creación de <strong class="text-white">Gallo Financial Technology</strong></span>
+    <footer class="bg-brand-footer text-white mt-auto w-full flex justify-center">
+        <div class="flex justify-between items-center w-full max-w-[1792px] py-3 px-6 text-xs">
+            <span class="text-blue-200">Versión: 3.18.3</span>
+            <span class="text-blue-200">Una creación de <strong class="text-white">Gallo Financial Technology</strong></span>
+        </div>
     </footer>
 
-    <!-- Lógica de Scroll Event fluida -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             let isScrolled = false;
@@ -553,7 +491,6 @@
                     document.body.classList.remove('scrolled');
                 }
             };
-            
             window.addEventListener('scroll', handleScroll, { passive: true });
             handleScroll();
         });
