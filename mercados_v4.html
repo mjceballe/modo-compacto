@@ -92,6 +92,22 @@
         .logo-wrapper { transition: transform 0.3s ease; transform-origin: left center; }
         body.scrolled .logo-wrapper { transform: scale(0.8); }
 
+        /* Animación del Menú Hamburguesa */
+        .hamburger-wrapper {
+            width: 0;
+            opacity: 0;
+            margin-right: 0;
+            pointer-events: none;
+            transition: width 0.3s ease, opacity 0.2s ease, margin-right 0.3s ease;
+        }
+        
+        body.scrolled .hamburger-wrapper {
+            width: 32px;
+            opacity: 1;
+            margin-right: 1rem; /* 16px de separación con el logo */
+            pointer-events: auto;
+        }
+
         /* 3. Tarjeta de Título */
         .title-card {
             position: relative;
@@ -158,11 +174,6 @@
         .data-table tbody td, .data-table thead tr:nth-child(2) th { border-bottom: 1px solid #e5e7eb; }
         .data-table tbody tr:hover td:not(.bg-brand-venderBg):not(.bg-brand-comprarBg) { background-color: #f9fafb; }
         
-        .data-table thead tr:first-child th:first-child { border-top-left-radius: calc(0.5rem - 1px); }
-        .data-table thead tr:first-child th:last-child { border-top-right-radius: calc(0.5rem - 1px); }
-        .data-table tbody tr:last-child td:first-child { border-bottom-left-radius: calc(0.5rem - 1px); }
-        .data-table tbody tr:last-child td:last-child { border-bottom-right-radius: calc(0.5rem - 1px); }
-
         .variation-pill { display: inline-flex; align-items: center; justify-content: center; height: 16px; padding: 0 6px; border-radius: 9999px; font-weight: 500; }
         .variation-pos { background-color: #def7ec; color: #046c4e; }
         .variation-neg { background-color: #fde8e8; color: #9b1c1c; }
@@ -205,8 +216,8 @@
         <div class="flex items-center justify-between px-8 h-16 w-full max-w-[1792px]">
             <div class="flex items-center h-8">
                 <!-- Menú Hamburguesa -->
-                <div class="relative" id="hamburger-menu-container">
-                    <button id="btn-hamburger" class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-brand-active hover:bg-blue-50 rounded-md transition-colors shrink-0 mr-4">
+                <div class="relative hamburger-wrapper" id="hamburger-menu-container">
+                    <button id="btn-hamburger" class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-brand-active hover:bg-blue-50 rounded-md transition-colors shrink-0">
                         <i class="ph ph-list text-[24px]"></i>
                     </button>
                     <!-- Menú Desplegable Hamburguesa -->
@@ -323,7 +334,7 @@
     <div class="reduced-filter-bar flex justify-center">
         <div class="flex items-center justify-between px-8 w-full max-w-[1792px] h-full">
             <div class="text-[#676C7E]">Filtros aplicados: <span id="applied-filters-text" class="font-bold text-[#676C7E]">Líderes | Plazo: 24h</span></div>
-            <button class="btn-fullscreen text-brand-active font-medium hover:bg-[#E1E6F9] rounded-[4px] px-2 inline-flex items-center justify-center gap-1 transition-colors text-[11px] h-[18px]" title="Ver en pantalla completa (F11)">
+            <button class="btn-fullscreen text-brand-active font-medium hover:bg-[#E1E6F9] rounded-[4px] px-2 inline-flex items-center justify-center gap-1 transition-colors text-[11px] h-[18px]" title="Atajo F11 u Opc+Cmd+F">
                 <i class="ph ph-corners-out text-[13.5px] leading-none"></i>
                 <span class="leading-none pt-[1px]">Ver en pantalla completa</span>
             </button>
@@ -648,10 +659,10 @@
                 document.querySelectorAll('.btn-fullscreen').forEach(btn => {
                     if (isFull) {
                         btn.innerHTML = '<i class="ph ph-corners-in text-[13.5px] leading-none"></i> <span class="leading-none pt-[1px]">Salir de pantalla completa</span>';
-                        btn.setAttribute('title', 'Salir de pantalla completa (F11 u Opc+Cmd+F)');
+                        btn.setAttribute('title', 'Salir de pantalla completa');
                     } else {
                         btn.innerHTML = '<i class="ph ph-corners-out text-[13.5px] leading-none"></i> <span class="leading-none pt-[1px]">Ver en pantalla completa</span>';
-                        btn.setAttribute('title', 'Ver en pantalla completa (F11 u Opc+Cmd+F)');
+                        btn.setAttribute('title', 'Atajo F11 u Opc+Cmd+F');
                     }
                 });
             };
