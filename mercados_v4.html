@@ -73,9 +73,12 @@
             border-bottom-color: transparent !important;
         }
 
-        /* 2. Filas inferiores del Header (Flujo Normal) 
-           Se deslizarán nativamente por debajo del Top Nav gracias al z-index 40 vs 50 */
-        .header-row-2, .header-row-3 {
+        /* 2. Filas inferiores del Header (Flujo Normal) */
+        .header-row-2 {
+            position: relative;
+            z-index: 41; /* Mayor z-index para que sus dropdowns tapen a la fila inferior */
+        }
+        .header-row-3 {
             position: relative;
             z-index: 40; 
         }
@@ -174,6 +177,25 @@
             display: flex;
             flex-direction: column;
         }
+
+        /* --- OVERRIDES NATIVOS PARA FULLSCREEN Y SIMULADO --- */
+        body.is-fullscreen, body.is-fullscreen-simulated { height: 100vh; overflow: hidden; }
+        body.is-fullscreen #top-nav, body.is-fullscreen-simulated #top-nav,
+        body.is-fullscreen .header-row-2, body.is-fullscreen-simulated .header-row-2,
+        body.is-fullscreen .header-row-3, body.is-fullscreen-simulated .header-row-3,
+        body.is-fullscreen .title-card, body.is-fullscreen-simulated .title-card,
+        body.is-fullscreen footer, body.is-fullscreen-simulated footer { display: none !important; }
+        
+        body.is-fullscreen .main-content-wrapper, body.is-fullscreen-simulated .main-content-wrapper { 
+            padding: 2rem !important; 
+            width: 100% !important; 
+            min-width: 1200px !important; 
+            max-width: 1792px !important; 
+            height: 100vh; 
+        }
+        body.is-fullscreen .reduced-filter-bar, body.is-fullscreen-simulated .reduced-filter-bar { top: 0 !important; }
+        body.is-fullscreen .sticky-thead, body.is-fullscreen-simulated .sticky-thead { top: 0 !important; }
+        body.is-fullscreen.filters-scrolled .sticky-thead, body.is-fullscreen-simulated.filters-scrolled .sticky-thead { top: 26px !important; }
     </style>
 </head>
 <body class="text-text-main text-sm">
@@ -253,7 +275,7 @@
                 <a href="#" class="relative h-12 flex flex-col justify-start group"><span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors gap-1">Cuenta <i class="ph ph-caret-down text-sm"></i></span></a>
                 
                 <div class="relative h-12 flex flex-col justify-start group">
-                    <button class="h-9 px-4 flex items-center justify-center text-brand-active font-bold bg-[#f4f5f8] rounded-[10px] text-[14px] transition-colors gap-1 outline-none">
+                    <button class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors gap-1 outline-none">
                         Versión 4 <i class="ph ph-caret-down text-sm"></i>
                     </button>
                     <div class="absolute top-full left-0 pt-1 w-56 hidden group-hover:block z-[100]">
@@ -301,10 +323,9 @@
     <div class="reduced-filter-bar flex justify-center">
         <div class="flex items-center justify-between px-8 w-full max-w-[1792px] h-full">
             <div class="text-[#676C7E]">Filtros aplicados: <span id="applied-filters-text" class="font-bold text-[#676C7E]">Líderes | Plazo: 24h</span></div>
-            <!-- Botón Fullscreen nativo -->
-            <button class="btn-fullscreen text-brand-active font-medium hover:bg-[#E1E6F9] rounded-[4px] px-2 flex items-center justify-center gap-1 transition-colors h-[18px]" title="Ver en pantalla completa (F11)">
-                <i class="ph ph-corners-out text-[13.5px] flex items-center justify-center"></i>
-                <span class="text-[11px] flex items-center justify-center">Ver en pantalla completa</span>
+            <button class="btn-fullscreen text-brand-active font-medium hover:bg-[#E1E6F9] rounded-[4px] px-2 inline-flex items-center justify-center gap-1 transition-colors text-[11px] h-[18px]" title="Ver en pantalla completa (F11)">
+                <i class="ph ph-corners-out text-[13.5px] leading-none"></i>
+                <span class="leading-none pt-[1px]">Ver en pantalla completa</span>
             </button>
         </div>
     </div>
@@ -499,6 +520,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             let isScrolled = false;
             let areFiltersScrolled = false;
+            let isSimulatedFullscreen = false;
             
             // --- MENÚ HAMBURGUESA ---
             const btnHamburger = document.getElementById('btn-hamburger');
@@ -609,7 +631,7 @@
                 const filtersContainer = document.getElementById('main-filters-container');
                 if (filtersContainer) {
                     const rect = filtersContainer.getBoundingClientRect();
-                    const offset = 64; // Como usamos la API de Fullscreen NATIVA, el header web siempre medirá 64px si no desaparece. Si se oculta el UI del browser no afecta la logica del DOM.
+                    const offset = 64; 
                     if (rect.bottom < offset && !areFiltersScrolled) {
                         areFiltersScrolled = true;
                         document.body.classList.add('filters-scrolled');
@@ -625,10 +647,10 @@
             const updateFullscreenUI = (isFull) => {
                 document.querySelectorAll('.btn-fullscreen').forEach(btn => {
                     if (isFull) {
-                        btn.innerHTML = '<i class="ph ph-corners-in text-[13.5px] flex items-center justify-center"></i> <span class="text-[11px] flex items-center justify-center">Salir de pantalla completa</span>';
+                        btn.innerHTML = '<i class="ph ph-corners-in text-[13.5px] leading-none"></i> <span class="leading-none pt-[1px]">Salir de pantalla completa</span>';
                         btn.setAttribute('title', 'Salir de pantalla completa (F11 u Opc+Cmd+F)');
                     } else {
-                        btn.innerHTML = '<i class="ph ph-corners-out text-[13.5px] flex items-center justify-center"></i> <span class="text-[11px] flex items-center justify-center">Ver en pantalla completa</span>';
+                        btn.innerHTML = '<i class="ph ph-corners-out text-[13.5px] leading-none"></i> <span class="leading-none pt-[1px]">Ver en pantalla completa</span>';
                         btn.setAttribute('title', 'Ver en pantalla completa (F11 u Opc+Cmd+F)');
                     }
                 });
