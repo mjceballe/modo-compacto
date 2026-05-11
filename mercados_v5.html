@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallo - Mercados V5</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            blue: '#1e3a8a',
+                            active: '#3557D4',
+                            bg: '#F2F4FC', /* Fondo general */
+                            card: '#ffffff',
+                            footer: '#2e386e',
+                            venderBg: '#f4f5f8',
+                            comprarBg: '#eaecef',
+                            headerBg: '#f1f4f9',
+                            headerVenderBg: '#e2e8f0',
+                            headerComprarBg: '#cbd5e1',
+                        },
+                        text: {
+                            main: '#1f2937',
+                            muted: '#6b7280',
+                            light: '#9ca3af'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --title-height: 92px;
+            --row-height: 32px;
+            --thead-top: 32px;
+            --thead-bottom: 32px;
+        }
+
+        html, body {
+            overflow-anchor: none;
+            background-color: #F2F4FC;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            min-width: 1200px;
+        }
+
+        /* --- ARQUITECTURA NATIVA 0 JUMPS --- */
+        /* 1. Top Nav - Se queda pegado arriba (Sticky) */
+        #top-nav {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background-color: white;
+            transition: box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        body.scrolled #top-nav {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+            border-bottom-color: transparent !important;
+        }
+
+        /* 2. Filas inferiores del Header (Flujo Normal) */
+        .header-row-2 {
+            position: relative;
+            z-index: 41; /* Mayor z-index para que sus dropdowns tapen a la fila inferior */
+        }
+        .header-row-3 {
+            position: relative;
+            z-index: 40; 
+        }
+
+        /* Utilidades para ocultar/mostrar elementos dentro de la Fila 1 al hacer scroll */
+        .hide-on-scroll { transition: opacity 0.2s ease; }
+        body.scrolled .hide-on-scroll { display: none !important; }
+        .scrolled-show { display: none !important; }
+        body.scrolled .scrolled-show { display: flex !important; }
+
+        .logo-wrapper { transition: transform 0.3s ease; transform-origin: left center; }
+        body.scrolled .logo-wrapper { transform: scale(0.8); }
+
+        /* Animación del Menú Hamburguesa */
+        .hamburger-wrapper {
+            width: 0;
+            opacity: 0;
+            margin-right: 0;
+            pointer-events: none;
+            transition: width 0.3s ease, opacity 0.2s ease, margin-right 0.3s ease;
+        }
+        
+        body.scrolled .hamburger-wrapper {
+            width: 32px;
+            opacity: 1;
+            margin-right: 1rem; /* 16px de separación con el logo */
+            pointer-events: auto;
+        }
+
+        /* 3. Tarjeta de Título */
+        .title-card {
+            position: relative;
+            z-index: 35;
+            height: var(--title-height);
+            min-height: var(--title-height);
+            max-height: var(--title-height);
+            box-sizing: border-box;
+            background-color: white;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 2rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            flex-shrink: 0;
+        }
+
+        /* 4. BARRA REDUCIDA DE FILTROS */
+        .reduced-filter-bar {
+            position: fixed;
+            top: 64px; /* Pegada debajo del header minimizado */
+            left: 0;
+            z-index: 45; /* Por encima del thead pero debajo del Top Nav */
+            width: 100%;
+            height: 36px; /* Alto fijo solicitado en la versión 5 */
+            background-color: #f8fafc;
+            border-bottom: 1px solid transparent;
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.3s ease, opacity 0.2s ease, border-color 0.3s ease;
+        }
+
+        body.filters-scrolled .reduced-filter-bar {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+            border-bottom-color: #e5e7eb;
+        }
+
+        /* 5. Thead Sticky Escalonado */
+        .sticky-thead {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 64px; /* Top Nav (64px) */
+            z-index: 30;
+            transition: top 0.3s ease;
+        }
+        body.filters-scrolled .sticky-thead {
+            top: 100px; /* Top Nav (64px) + Filtros reducidos (36px) = 100px */
+        }
+
+        /* Estructura de Tabla */
+        .data-table tbody tr { height: var(--row-height); min-height: var(--row-height); max-height: var(--row-height); }
+        .data-table thead tr:nth-child(1) { height: var(--thead-top); min-height: var(--thead-top); max-height: var(--thead-top); }
+        .data-table thead tr:nth-child(2) { height: var(--thead-bottom); min-height: var(--thead-bottom); max-height: var(--thead-bottom); }
+
+        .data-table td, .data-table th { padding-top: 0; padding-bottom: 0; vertical-align: middle; white-space: nowrap; }
+        .data-table { border-collapse: separate; border-spacing: 0; }
+        .data-table thead tr:first-child th { border-top: 1px solid #e5e7eb; }
+        .data-table tbody tr { background-color: #ffffff; }
+        .data-table tbody td, .data-table thead tr:nth-child(2) th { border-bottom: 1px solid #e5e7eb; }
+        .data-table tbody tr:hover td:not(.bg-brand-venderBg):not(.bg-brand-comprarBg) { background-color: #f9fafb; }
+        
+        .variation-pill { display: inline-flex; align-items: center; justify-content: center; height: 16px; padding: 0 6px; border-radius: 9999px; font-weight: 500; }
+        .variation-pos { background-color: #def7ec; color: #046c4e; }
+        .variation-neg { background-color: #fde8e8; color: #9b1c1c; }
+
+        .main-content-wrapper {
+            flex-grow: 1;
+            padding: 2rem;
+            width: 100%;
+            min-width: 1200px;
+            max-width: 1792px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- OVERRIDES NATIVOS PARA FULLSCREEN Y SIMULADO --- */
+        body.is-fullscreen, body.is-fullscreen-simulated { height: 100vh; overflow: hidden; }
+        body.is-fullscreen #top-nav, body.is-fullscreen-simulated #top-nav,
+        body.is-fullscreen .header-row-2, body.is-fullscreen-simulated .header-row-2,
+        body.is-fullscreen .header-row-3, body.is-fullscreen-simulated .header-row-3,
+        body.is-fullscreen .title-card, body.is-fullscreen-simulated .title-card,
+        body.is-fullscreen footer, body.is-fullscreen-simulated footer { display: none !important; }
+        
+        body.is-fullscreen .main-content-wrapper, body.is-fullscreen-simulated .main-content-wrapper { 
+            padding: 2rem !important; 
+            width: 100% !important; 
+            min-width: 1200px !important; 
+            max-width: 1792px !important; 
+            height: 100vh; 
+        }
+        body.is-fullscreen .reduced-filter-bar, body.is-fullscreen-simulated .reduced-filter-bar { top: 0 !important; }
+        body.is-fullscreen .sticky-thead, body.is-fullscreen-simulated .sticky-thead { top: 0 !important; }
+        body.is-fullscreen.filters-scrolled .sticky-thead, body.is-fullscreen-simulated.filters-scrolled .sticky-thead { top: 36px !important; }
+    </style>
+</head>
+<body class="text-text-main text-sm">
+
+    <!-- Fila 1: Top Nav (Sticky Nativamente) -->
+    <header id="top-nav" class="w-full flex justify-center">
+        <div class="flex items-center justify-between px-8 h-16 w-full max-w-[1792px]">
+            <div class="flex items-center h-8">
+                <!-- Menú Hamburguesa -->
+                <div class="relative hamburger-wrapper" id="hamburger-menu-container">
+                    <button id="btn-hamburger" class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-brand-active hover:bg-blue-50 rounded-md transition-colors shrink-0">
+                        <i class="ph ph-list text-[24px]"></i>
+                    </button>
+                    <!-- Menú Desplegable Hamburguesa -->
+                    <div id="hamburger-dropdown" class="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-xl hidden z-[100] overflow-hidden flex-col py-1">
+                        <a href="#" class="block px-5 py-3.5 text-[15px] text-brand-active bg-[#f4f5f8] font-medium border-b border-gray-100 transition-colors">Inicio</a>
+                        <a href="#" class="block px-5 py-3.5 text-[15px] text-gray-600 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">Mercados</a>
+                        <a href="#" class="block px-5 py-3.5 text-[15px] text-gray-600 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">Portafolio</a>
+                        <a href="#" class="block px-5 py-3.5 text-[15px] text-gray-600 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">Resultados</a>
+                        <a href="#" class="block px-5 py-3.5 text-[15px] text-gray-600 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">Actividad</a>
+                        <a href="#" class="block px-5 py-3.5 text-[15px] text-gray-600 hover:bg-gray-50 hover:text-brand-active transition-colors">Cuenta</a>
+                    </div>
+                </div>
+
+                <!-- Logo SVG -->
+                <div class="flex items-center h-full logo-wrapper">
+                    <svg width="146" height="40" viewBox="0 0 146 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M30.1484 9.50942H6.05986C5.96528 9.50942 5.87296 9.54503 5.8054 9.60787L0.105839 14.9098C0.0382823 14.9726 0 15.0585 0 15.1465V20.3688C0 20.4568 0.0382823 20.5427 0.105839 20.6055L5.80765 25.9095C5.87521 25.9724 5.96754 26.008 6.06212 26.008H26.9778C27.1759 26.008 27.3381 25.8593 27.3381 25.6728V20.8443C27.3381 20.66 27.1759 20.5092 26.9778 20.5092H6.27154C6.07338 20.5092 5.91124 20.3604 5.91124 20.174V15.3434C5.91124 15.1591 6.07112 15.0082 6.27154 15.0082H29.9368C30.1349 15.0082 30.2971 15.1591 30.2971 15.3434V30.1641C30.2971 30.3484 30.1349 30.4992 29.9368 30.4992H10.8632C10.7686 30.4992 10.6763 30.5348 10.6087 30.5977L5.41807 35.4283C5.19063 35.6398 5.35277 36.0001 5.67254 36.0001H30.1507C30.2453 36.0001 30.3376 35.9645 30.4052 35.9017L36.1047 30.5977C36.1723 30.5348 36.2106 30.449 36.2106 30.361V15.1465C36.2106 15.0585 36.1723 14.9726 36.1047 14.9098L30.4052 9.60578C30.3376 9.54294 30.2453 9.50732 30.1507 9.50732" fill="#3557D4"/>
+                        <path d="M77.0009 20.1719V15.1465C77.0009 15.0585 76.9626 14.9726 76.8951 14.9098L71.1932 9.60578C71.1257 9.54294 71.0334 9.50732 70.9388 9.50732H46.8502C46.7556 9.50732 46.6633 9.54294 46.5957 9.60578L40.8939 14.9098C40.8264 14.9726 40.7881 15.0585 40.7881 15.1465V20.3688C40.7881 20.4568 40.8264 20.5427 40.8939 20.6055L46.5957 25.9095C46.6633 25.9724 46.7556 26.008 46.8502 26.008H79.9441C80.1423 26.008 80.3044 25.8572 80.3044 25.6728V20.8443C80.3044 20.66 80.1423 20.5092 79.9441 20.5092H77.359C77.1608 20.5092 76.9986 20.3583 76.9986 20.174M70.7271 20.5092H47.0619C46.8637 20.5092 46.7016 20.3583 46.7016 20.174V15.3455C46.7016 15.1612 46.8637 15.0103 47.0619 15.0103H70.7271C70.9253 15.0103 71.0874 15.1612 71.0874 15.3455V20.174C71.0874 20.3583 70.9253 20.5092 70.7271 20.5092Z" fill="#3557D4"/>
+                        <path d="M145.449 14.9098L139.747 9.60578C139.68 9.54294 139.587 9.50732 139.493 9.50732H118.573C118.375 9.50732 118.212 9.65815 118.212 9.84249V14.671C118.212 14.8553 118.375 15.0062 118.573 15.0062H139.283C139.482 15.0062 139.644 15.157 139.644 15.3413V20.1719C139.644 20.3562 139.482 20.5071 139.283 20.5071H115.618C115.42 20.5071 115.258 20.3562 115.258 20.1719V10.318C115.258 10.0205 114.871 9.86972 114.643 10.0813L109.453 14.9098C109.385 14.9726 109.347 15.0585 109.347 15.1465V20.3688C109.347 20.4568 109.385 20.5427 109.453 20.6055L115.154 25.9095C115.222 25.9724 115.314 26.008 115.409 26.008H139.497C139.592 26.008 139.684 25.9724 139.752 25.9095L145.454 20.6055C145.521 20.5427 145.559 20.4568 145.559 20.3688V15.1465C145.559 15.0585 145.521 14.9726 145.454 14.9098" fill="#3557D4"/>
+                        <path d="M85.3415 4H82.7451C82.5469 4 82.3848 4.15082 82.3848 4.33517V9.13643C82.3848 9.32077 82.5469 9.47159 82.7451 9.47159H84.9812C85.1794 9.47159 85.3415 9.62242 85.3415 9.80676V25.6727C85.3415 25.8571 85.5036 26.0079 85.7018 26.0079H90.8924C91.0906 26.0079 91.2528 25.8571 91.2528 25.6727V4.33517C91.2528 4.15082 91.0929 4 90.8924 4H85.3415Z" fill="#3557D4"/>
+                        <path d="M98.8044 4H96.208C96.0098 4 95.8477 4.15082 95.8477 4.33517V9.13643C95.8477 9.32077 96.0098 9.47159 96.208 9.47159H98.4441C98.6423 9.47159 98.8044 9.62242 98.8044 9.80676V25.6727C98.8044 25.8571 98.9665 26.0079 99.1647 26.0079H104.355C104.554 26.0079 104.716 25.8571 104.716 25.6727V4.33517C104.716 4.15082 104.556 4 104.355 4H98.8044Z" fill="#3557D4"/>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="flex-1 max-w-[600px] mx-4 lg:mx-8 relative flex items-center h-8">
+                <i class="ph ph-magnifying-glass absolute left-4 text-gray-500 text-lg font-bold"></i>
+                <input type="text" placeholder="Buscá un instrumento" class="w-full h-full pl-11 pr-4 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:border-brand-active focus:ring-1 focus:ring-brand-active">
+            </div>
+
+            <div class="flex items-center gap-2 h-8">
+                <button class="hide-on-scroll text-gray-600 hover:text-gray-900 transition-colors flex items-center justify-center h-full w-8"><i class="ph ph-question text-2xl"></i></button>
+                <button class="text-gray-600 hover:text-gray-900 transition-colors relative flex items-center justify-center h-full w-8">
+                    <i class="ph ph-bell text-2xl"></i><span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+                </button>
+                <button class="hide-on-scroll text-gray-600 hover:text-gray-900 transition-colors flex items-center justify-center h-full w-8"><i class="ph ph-wallet text-2xl"></i></button>
+                <button class="text-gray-600 hover:text-gray-900 transition-colors flex items-center justify-center h-full w-8"><i class="ph ph-user-circle text-2xl"></i></button>
+                
+                <div class="scrolled-show items-center h-full ml-1 mr-1">
+                    <div class="border border-blue-600 bg-blue-50/50 rounded-full px-4 h-8 flex items-center text-[12px] text-gray-800 font-medium tracking-wide whitespace-nowrap">
+                        CC 125780 | Pérez, Juan C...
+                    </div>
+                </div>
+                
+                <div class="flex items-center bg-brand-active text-white rounded-lg shadow-sm h-full overflow-hidden">
+                    <button class="px-4 h-full font-medium hover:bg-blue-700 transition-colors text-[14px] flex items-center">Operar</button>
+                    <div class="w-px h-5 bg-white/40"></div>
+                    <button class="px-2.5 h-full hover:bg-blue-700 transition-colors flex items-center"><i class="ph ph-caret-down text-lg"></i></button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Fila 2: Main Nav (Se desliza nativamente bajo Top Nav) -->
+    <div class="header-row-2 w-full border-b border-gray-200 flex justify-center bg-white h-16">
+        <div class="flex justify-between px-8 h-full w-full max-w-[1792px]">
+            <nav class="flex items-end h-full gap-1">
+                <a href="#" class="relative h-12 flex flex-col justify-start group"><span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors">Inicio</span></a>
+                <a href="#" class="relative h-12 flex flex-col justify-start">
+                    <span class="h-9 px-5 flex items-center justify-center text-brand-active text-[14px] font-bold bg-[#f4f5f8] rounded-[10px]">Mercados</span>
+                    <span class="absolute -bottom-[1px] left-0 w-full h-[3px] bg-brand-active rounded-t-sm z-10"></span>
+                </a>
+                <a href="#" class="relative h-12 flex flex-col justify-start group"><span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors gap-1">Portafolio <i class="ph ph-caret-down text-sm"></i></span></a>
+                <a href="#" class="relative h-12 flex flex-col justify-start group"><span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors">Resultados</span></a>
+                <a href="#" class="relative h-12 flex flex-col justify-start group"><span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors">Actividad</span></a>
+                <a href="#" class="relative h-12 flex flex-col justify-start group"><span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors gap-1">Cuenta <i class="ph ph-caret-down text-sm"></i></span></a>
+                
+                <div class="relative h-12 flex flex-col justify-start group">
+                    <button class="h-9 px-4 flex items-center justify-center text-brand-active font-bold bg-[#f4f5f8] rounded-[10px] text-[14px] transition-colors gap-1 outline-none">
+                        Versión 5 <i class="ph ph-caret-down text-sm"></i>
+                    </button>
+                    <div class="absolute top-full left-0 pt-1 w-56 hidden group-hover:block z-[100]">
+                        <div class="bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden flex flex-col">
+                            <a href="index.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">Versión 0 (Original)</a>
+                            <a href="mercados_v1.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">Versión 1 (Scroll)</a>
+                            <a href="mercados_v2.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">Versión 2 (Sticky)</a>
+                            <a href="mercados_v3.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">Versión 3 (Expandir card)</a>
+                            <a href="mercados_v4.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">Versión 4 (Unificada)</a>
+                            <a href="mercados_v5.html" class="block px-4 py-2.5 text-[13px] text-brand-active bg-gray-50 font-medium hover:bg-gray-100 transition-colors">Versión 5 (chips)</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            <div class="flex items-center h-full hide-on-scroll">
+                <div class="border border-blue-600 bg-blue-50/50 rounded-full px-5 h-8 flex items-center text-[13px] text-gray-800 font-medium tracking-wide">
+                    CC 125780 | Pérez, Juan C...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fila 3: Balance Bar (Se desliza nativamente bajo Top Nav) -->
+    <div class="header-row-3 w-full bg-[#f8fafc] border-b border-gray-100 shadow-[0_4px_6px_-6px_rgba(0,0,0,0.1)] flex justify-center h-16">
+        <div class="flex items-center justify-between px-8 h-full w-full max-w-[1792px]">
+            <div class="flex items-center h-8">
+                <span class="text-[14px] font-semibold text-gray-800 mr-5 flex items-center h-full">Disponible para operar</span>
+                <div class="flex items-center bg-white border border-gray-300 rounded-lg overflow-hidden text-xs font-medium p-[2px] h-full">
+                    <button class="px-3 h-full flex items-center text-gray-500 hover:bg-gray-50 rounded-md">C.I.</button>
+                    <button class="px-3 h-full flex items-center bg-blue-100/60 text-brand-active rounded-md">24h</button>
+                </div>
+                <div class="w-px h-5 bg-gray-300 mx-5"></div>
+                <div class="flex items-center text-[14px] h-full"><span class="text-gray-400 font-semibold text-xs mr-1.5 tracking-wider">ARS</span><span class="font-bold text-gray-900 text-[15px]">123.456</span><span class="text-gray-500 font-medium text-[13px]">,78</span></div>
+                <div class="w-px h-5 bg-gray-300 mx-5"></div>
+                <div class="flex items-center text-[14px] h-full"><span class="text-gray-400 font-semibold text-xs mr-1.5 tracking-wider">USD</span><span class="font-bold text-gray-900 text-[15px]">900</span><span class="text-gray-500 font-medium text-[13px]">,00</span></div>
+                <div class="w-px h-5 bg-gray-300 mx-5"></div>
+                <div class="flex items-center text-[14px] opacity-70 h-full"><span class="text-gray-400 font-semibold text-xs mr-1.5 tracking-wider">USD EXT</span><span class="font-bold text-gray-700 text-[15px]">0</span><span class="text-gray-400 font-medium text-[13px]">,00</span></div>
+                <div class="w-px h-5 bg-gray-300 mx-5"></div>
+                <a href="#" class="text-[13px] text-gray-500 hover:text-gray-800 underline underline-offset-2 decoration-gray-400 flex items-center font-medium h-full">Ver detalle <i class="ph ph-arrow-right ml-1"></i></a>
+            </div>
+            <a href="#" class="text-brand-active text-[14px] font-medium hover:text-blue-800 transition-colors h-8 flex items-center">Ingresar/retirar fondos</a>
+        </div>
+    </div>
+
+    <!-- BARRA REDUCIDA DE FILTROS (36px, Chips Removibles) -->
+    <div class="reduced-filter-bar flex justify-center">
+        <div class="flex items-center justify-between px-8 w-full max-w-[1792px] h-full">
+            <div class="flex items-center text-[#676C7E]">
+                <span class="mr-3 text-[12px]">Filtros aplicados:</span>
+                <div id="applied-filters-chips" class="flex items-center gap-2">
+                    <!-- Chips inyectados por JS -->
+                </div>
+            </div>
+            <!-- Botón Fullscreen exclusivo para la barra minimizada (icon-button) -->
+            <button class="btn-fullscreen text-brand-active hover:bg-[#E1E6F9] rounded-[4px] w-6 h-6 flex items-center justify-center transition-colors" title="Ver en pantalla completa (F11 u Opc+Cmd+F)">
+                <i class="ph ph-corners-out text-[16px]"></i>
+            </button>
+        </div>
+    </div>
+
+    <main class="main-content-wrapper z-30 relative">
+        
+        <!-- CARD TITLE -->
+        <div class="title-card">
+            <div class="flex items-center text-xs text-brand-active mb-1 gap-1">
+                <i class="ph ph-house"></i>
+                <a href="#" class="hover:underline">Inicio</a>
+                <i class="ph ph-caret-right text-gray-400 text-[10px]"></i>
+                <span class="text-gray-500">Mercados</span>
+            </div>
+            <h1 class="text-2xl font-bold text-gray-800">Mercados</h1>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col flex-grow">
+            <!-- Pestañas Principales -->
+            <div class="flex px-8 border-b border-gray-200 shrink-0">
+                <button class="px-4 py-3 text-brand-active font-medium border-b-2 border-brand-active text-sm">BYMA</button>
+                <button class="px-4 py-3 text-gray-500 hover:text-gray-800 font-medium text-sm">A3</button>
+                <button class="px-4 py-3 text-gray-500 hover:text-gray-800 font-medium text-sm">Mercado USA</button>
+                <button class="px-4 py-3 text-gray-500 hover:text-gray-800 font-medium text-sm flex items-center gap-1"><i class="ph ph-star"></i> Favoritos</button>
+                <button class="px-4 py-3 text-gray-500 hover:text-gray-800 font-medium text-sm flex items-center gap-1"><i class="ph ph-thumbs-up"></i> Recomendados</button>
+            </div>
+            
+            <!-- Pestañas Secundarias (Categorías) -->
+            <div class="px-8 mt-4 flex gap-2 overflow-x-auto shrink-0">
+                <button class="filter-pill px-4 py-1.5 bg-blue-50 text-brand-active rounded-full text-xs font-medium border border-blue-200">Líderes</button>
+                <button class="filter-pill px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">General</button>
+                <button class="filter-pill px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">Opciones</button>
+                <button class="filter-pill px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">Cedears</button>
+                <button class="filter-pill px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">Bonos</button>
+                <button class="filter-pill px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">Letras</button>
+                <button class="filter-pill px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">ONs</button>
+                <button class="filter-pill px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">FCI</button>
+                <button class="filter-pill px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">Cauciones</button>
+                <button class="filter-pill px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">Índices</button>
+                <button class="filter-pill px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">Futuros</button>
+            </div>
+            
+            <!-- Barra de Filtros interactiva -->
+            <div id="main-filters-container" class="px-8 mt-4 flex items-center justify-between shrink-0 relative z-[45]">
+                <div class="flex items-center gap-3">
+                    <div class="relative w-64">
+                        <i class="ph ph-magnifying-glass absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" placeholder="Buscá especie o descripción" class="w-full pl-8 pr-3 py-1.5 bg-white border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-brand-active">
+                    </div>
+                    
+                    <!-- Dropdown Plazo -->
+                    <div class="relative group">
+                        <button id="btn-plazo" class="border border-brand-active text-brand-active bg-blue-50 px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 font-medium outline-none">
+                            Plazo: 24h <i class="ph ph-caret-down"></i>
+                        </button>
+                        <div class="absolute top-full left-0 pt-1 w-32 hidden group-hover:block z-[60]">
+                            <div class="bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden flex flex-col">
+                                <a href="#" class="filter-dropdown-item px-4 py-2.5 text-[12px] text-gray-700 hover:bg-gray-50 hover:text-brand-active" data-type="plazo" data-value="C.I.">C.I.</a>
+                                <a href="#" class="filter-dropdown-item px-4 py-2.5 text-[12px] text-brand-active bg-blue-50 font-medium" data-type="plazo" data-value="24h">24h</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Dropdown Variación -->
+                    <div class="relative group">
+                        <button id="btn-variacion" class="border border-gray-300 text-gray-600 bg-white px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 hover:bg-gray-50 outline-none transition-colors">
+                            Variación <i class="ph ph-caret-down"></i>
+                        </button>
+                        <div class="absolute top-full left-0 pt-1 w-32 hidden group-hover:block z-[60]">
+                            <div class="bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden flex flex-col">
+                                <a href="#" class="filter-dropdown-item px-4 py-2.5 text-[12px] text-brand-active bg-blue-50 font-medium" data-type="variacion" data-value="Todas">Todas</a>
+                                <a href="#" class="filter-dropdown-item px-4 py-2.5 text-[12px] text-gray-700 hover:bg-gray-50 hover:text-brand-active" data-type="variacion" data-value="Alza">Alza</a>
+                                <a href="#" class="filter-dropdown-item px-4 py-2.5 text-[12px] text-gray-700 hover:bg-gray-50 hover:text-brand-active" data-type="variacion" data-value="Baja">Baja</a>
+                                <a href="#" class="filter-dropdown-item px-4 py-2.5 text-[12px] text-gray-700 hover:bg-gray-50 hover:text-brand-active" data-type="variacion" data-value="Estable">Estable</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dropdown Moneda -->
+                    <div class="relative group">
+                        <button id="btn-moneda" class="border border-gray-300 text-gray-600 bg-white px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 hover:bg-gray-50 outline-none transition-colors">
+                            Moneda <i class="ph ph-caret-down"></i>
+                        </button>
+                        <div class="absolute top-full left-0 pt-1 w-32 hidden group-hover:block z-[60]">
+                            <div class="bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden flex flex-col">
+                                <a href="#" class="filter-dropdown-item px-4 py-2.5 text-[12px] text-brand-active bg-blue-50 font-medium" data-type="moneda" data-value="Todas">Todas</a>
+                                <a href="#" class="filter-dropdown-item px-4 py-2.5 text-[12px] text-gray-700 hover:bg-gray-50 hover:text-brand-active" data-type="moneda" data-value="ARS">ARS</a>
+                                <a href="#" class="filter-dropdown-item px-4 py-2.5 text-[12px] text-gray-700 hover:bg-gray-50 hover:text-brand-active" data-type="moneda" data-value="USD">USD</a>
+                                <a href="#" class="filter-dropdown-item px-4 py-2.5 text-[12px] text-gray-700 hover:bg-gray-50 hover:text-brand-active" data-type="moneda" data-value="USD Ext.">USD Ext.</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <label class="flex items-center gap-2 cursor-pointer ml-2">
+                        <input type="checkbox" id="chk-operados" class="rounded border-gray-300 text-brand-active focus:ring-brand-active w-4 h-4">
+                        <span class="text-xs text-gray-600">Mostrar solo operados</span>
+                        <i class="ph ph-info text-gray-400"></i>
+                    </label>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <button class="text-gray-500 hover:text-gray-700"><i class="ph ph-download-simple text-lg"></i></button>
+                </div>
+            </div>
+            
+            <!-- Tabla Principal -->
+            <div class="px-8 mt-4 mb-4 flex-grow relative">
+                <table class="w-full data-table text-[11px] text-right">
+                    <thead class="sticky-thead text-gray-700 shadow-sm">
+                        <tr>
+                            <th colspan="6" class="bg-brand-headerBg"></th>
+                            <th colspan="2" class="bg-brand-headerVenderBg text-center text-[11px] font-bold py-1">VENDER</th>
+                            <th colspan="2" class="bg-brand-headerComprarBg text-center text-[11px] font-bold py-1">COMPRAR</th>
+                            <th colspan="6" class="bg-brand-headerBg"></th>
+                        </tr>
+                        <tr class="font-medium text-gray-600">
+                            <th class="w-8 px-2 text-center py-2 bg-brand-headerBg"></th>
+                            <th class="w-8 px-2 text-center py-2 bg-brand-headerBg"></th>
+                            <th class="text-left px-2 py-2 bg-brand-headerBg">Especie <i class="ph ph-arrows-down-up text-[10px] ml-1"></i></th>
+                            <th class="text-left px-2 py-2 bg-brand-headerBg">Plazo</th>
+                            <th class="px-2 py-2 bg-brand-headerBg">Último <i class="ph ph-arrows-down-up text-[10px] ml-1"></i></th>
+                            <th class="px-2 py-2 bg-brand-headerBg">Var. % <i class="ph ph-arrows-down-up text-[10px] ml-1"></i></th>
+                            <th class="px-2 py-2 bg-brand-headerVenderBg">CC</th>
+                            <th class="px-2 py-2 bg-brand-headerVenderBg">PC</th>
+                            <th class="px-2 py-2 bg-brand-headerComprarBg">PV</th>
+                            <th class="px-2 py-2 bg-brand-headerComprarBg">CV</th>
+                            <th class="px-2 py-2 bg-brand-headerBg">Cierre</th>
+                            <th class="px-2 py-2 bg-brand-headerBg">Mín.</th>
+                            <th class="px-2 py-2 bg-brand-headerBg">Máx.</th>
+                            <th class="px-2 py-2 bg-brand-headerBg">Cant. op. <i class="ph ph-arrows-down-up text-[10px] ml-1"></i></th>
+                            <th class="px-2 py-2 bg-brand-headerBg">Volumen <i class="ph ph-arrows-down-up text-[10px] ml-1"></i></th>
+                            <th class="px-2 py-2 pr-4 bg-brand-headerBg">Hora</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-700 bg-white">
+                        <script>
+                            const data = [
+                                { esp: 'ALUA', plazo: '24h', ult: '34.557,92', var: 2.12, cc: '35.021', pc: '34.557,92', pv: '34.557,92', cv: '56.789', hora: '12:45:29', fav: false },
+                                { esp: 'YPFD', plazo: '24h', ult: '12.345,67', var: -0.12, cc: '78.221', pc: '12.345,67', pv: '12.352,67', cv: '92.345', hora: '12:45:29', fav: false },
+                                { esp: 'GGAL', plazo: '24h', ult: '34.557,92', var: 2.12, cc: '12.345', pc: '25.755,43', pv: '25.755,43', cv: '67.890', hora: '12:45:29', fav: false },
+                                { esp: 'YPFD', plazo: '24h', ult: '12.345,67', var: -0.12, cc: '87.654', pc: '25.755,43', pv: '45.727,31', cv: '81.234', hora: '12:45:29', fav: false },
+                                { esp: 'PAMP', plazo: '24h', ult: '25.755,43', var: -0.12, cc: '65.432', pc: '38.789,11', pv: '23.456,78', cv: '72.456', hora: '12:45:29', fav: false },
+                                { esp: 'BMA',  plazo: '24h', ult: '38.789,11', var: 2.12, cc: '12.345', pc: '23.456,78', pv: '87.652,34', cv: '92.345', hora: '12:45:29', fav: false },
+                                { esp: 'CRES', plazo: '24h', ult: '23.456,78', var: 2.12, cc: '65.432', pc: '23.456,78', pv: '25.755,43', cv: '72.456', hora: '12:45:29', fav: true },
+                                { esp: 'LOMA', plazo: '24h', ult: '87.654,32', var: 2.12, cc: '45.678', pc: '87.654,32', pv: '87.652,34', cv: '49.876', hora: '12:45:29', fav: false },
+                            ];
+                            const fullData = [...data, ...data, ...data, ...data, ...data, ...data, ...data, ...data];
+                            fullData.forEach((row, i) => {
+                                const isPos = row.var > 0;
+                                const varClass = isPos ? 'variation-pos' : 'variation-neg';
+                                const varIcon = isPos ? 'ph-arrow-up' : 'ph-arrow-down';
+                                const showPlazoArrow = (i % 2 === 0);
+                                const arrowIndic = showPlazoArrow ? (isPos ? '<i class="ph ph-arrow-up text-green-500 font-bold ml-1"></i>' : '<i class="ph ph-arrow-down text-red-500 font-bold ml-1"></i>') : '';
+                                const starClass = row.fav ? 'ph-star text-brand-active fill-current' : 'ph-star text-gray-300';
+                                const starWeight = row.fav ? 'weight="fill"' : '';
+                                document.write(`
+                                    <tr class="bg-white">
+                                        <td class="px-2 text-center text-gray-300"><i class="ph ph-dots-six-vertical cursor-grab"></i></td>
+                                        <td class="px-2 text-center"><i class="ph ${starClass} text-sm cursor-pointer" ${starWeight}></i></td>
+                                        <td class="px-2 text-left font-bold text-gray-800">${row.esp}</td>
+                                        <td class="px-2 text-left font-bold">${row.plazo} ${arrowIndic}</td>
+                                        <td class="px-2">${row.ult}</td>
+                                        <td class="px-2"><span class="variation-pill ${varClass}"><i class="ph ${varIcon} mr-0.5"></i> ${Math.abs(row.var)}%</span></td>
+                                        <td class="px-2 bg-brand-venderBg">${row.cc}</td>
+                                        <td class="px-2 bg-brand-venderBg">${row.pc}</td>
+                                        <td class="px-2 bg-brand-comprarBg">${row.pv}</td>
+                                        <td class="px-2 bg-brand-comprarBg">${row.cv}</td>
+                                        <td class="px-2 text-gray-500">34.557,92</td>
+                                        <td class="px-2 text-gray-500">34.557,92</td>
+                                        <td class="px-2 text-gray-500">34.557,92</td>
+                                        <td class="px-2 text-gray-500">50.123.456</td>
+                                        <td class="px-2 text-gray-500">50.123.456</td>
+                                        <td class="px-2 pr-4 text-gray-800">${row.hora}</td>
+                                    </tr>
+                                `);
+                            });
+                        </script>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-brand-footer text-white mt-auto w-full flex justify-center z-30 relative">
+        <div class="flex justify-between items-center w-full max-w-[1792px] py-3 px-8 text-xs">
+            <span class="text-blue-200">Versión: 3.18.3</span>
+            <span class="text-blue-200">Una creación de <strong class="text-white">Gallo Financial Technology</strong></span>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let isScrolled = false;
+            let areFiltersScrolled = false;
+            let isSimulatedFullscreen = false;
+            
+            // --- MENÚ HAMBURGUESA ---
+            const btnHamburger = document.getElementById('btn-hamburger');
+            const hamburgerDropdown = document.getElementById('hamburger-dropdown');
+            
+            btnHamburger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                hamburgerDropdown.classList.toggle('hidden');
+                hamburgerDropdown.classList.toggle('flex');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!btnHamburger.contains(e.target) && !hamburgerDropdown.contains(e.target)) {
+                    hamburgerDropdown.classList.add('hidden');
+                    hamburgerDropdown.classList.remove('flex');
+                }
+            });
+
+            // --- ESTADO Y LÓGICA DE FILTROS ---
+            const activeFilters = {
+                categoria: 'Líderes',
+                plazo: '24h',
+                variacion: null,
+                moneda: null,
+                soloOperados: false
+            };
+
+            // Helpers para actualizar UI de botones principales desde los Chips
+            const updateDropdownUI = (type, value, defaultText) => {
+                const btn = document.getElementById(`btn-${type}`);
+                if (!btn) return;
+
+                const items = btn.nextElementSibling.querySelectorAll('.filter-dropdown-item');
+                items.forEach(sib => {
+                    sib.classList.remove('text-brand-active', 'bg-blue-50', 'font-medium');
+                    sib.classList.add('text-gray-700');
+                    if (value && sib.dataset.value === value) {
+                        sib.classList.remove('text-gray-700');
+                        sib.classList.add('text-brand-active', 'bg-blue-50', 'font-medium');
+                    }
+                });
+
+                if (value && value !== 'Todas') {
+                    btn.innerHTML = `${type === 'plazo' ? 'Plazo: ' + value : value} <i class="ph ph-caret-down"></i>`;
+                    btn.classList.add('border-brand-active', 'text-brand-active', 'bg-blue-50');
+                    btn.classList.remove('border-gray-300', 'text-gray-600', 'bg-white', 'hover:bg-gray-50');
+                } else {
+                    btn.innerHTML = `${defaultText} <i class="ph ph-caret-down"></i>`;
+                    btn.classList.remove('border-brand-active', 'text-brand-active', 'bg-blue-50');
+                    btn.classList.add('border-gray-300', 'text-gray-600', 'bg-white', 'hover:bg-gray-50');
+                }
+            };
+
+            // Función Render de Chips
+            const renderChips = () => {
+                const container = document.getElementById('applied-filters-chips');
+                container.innerHTML = ''; // Limpiar contenedor
+                
+                const createChip = (label, type) => {
+                    const chip = document.createElement('div');
+                    // Estilos del chip: px-2 aplica 8px de padding a la izquierda y derecha exactamente
+                    chip.className = 'flex items-center h-[20px] px-2 bg-white border border-[#D5D7DD] rounded-full text-[#676C7E] text-[11px] font-medium gap-1 cursor-default box-border';
+                    
+                    let chipHTML = `<span class="leading-none flex items-center">${label}</span>`;
+                    
+                    // Solo agregar la cruz "X" si NO es el filtro de categoría principal
+                    if (type !== 'categoria') {
+                        chipHTML += `
+                        <button class="text-[#676C7E] hover:bg-[#E1E6F9] rounded-[4px] focus:outline-none flex items-center justify-center w-[16px] h-[16px] transition-colors" data-type="${type}" title="Remover filtro">
+                            <i class="ph ph-x text-[12px] leading-none flex items-center justify-center"></i>
+                        </button>
+                        `;
+                    }
+                    
+                    chip.innerHTML = chipHTML;
+                    return chip;
+                };
+
+                // Inyección dinámica
+                if (activeFilters.categoria) {
+                    container.appendChild(createChip(activeFilters.categoria, 'categoria'));
+                }
+                if (activeFilters.plazo) {
+                    container.appendChild(createChip(`Plazo: ${activeFilters.plazo}`, 'plazo'));
+                }
+                if (activeFilters.variacion && activeFilters.variacion !== 'Todas') {
+                    container.appendChild(createChip(`Variación: ${activeFilters.variacion}`, 'variacion'));
+                }
+                if (activeFilters.moneda && activeFilters.moneda !== 'Todas') {
+                    container.appendChild(createChip(`Moneda: ${activeFilters.moneda}`, 'moneda'));
+                }
+                if (activeFilters.soloOperados) {
+                    container.appendChild(createChip('Ver sólo operados', 'soloOperados'));
+                }
+            };
+
+            // Evento global para borrar chips (Deleation)
+            document.getElementById('applied-filters-chips').addEventListener('click', (e) => {
+                const btn = e.target.closest('button');
+                if (!btn) return;
+                
+                const type = btn.dataset.type;
+                
+                if (type === 'plazo') {
+                    activeFilters.plazo = null;
+                    updateDropdownUI('plazo', null, 'Plazo');
+                } else if (type === 'variacion') {
+                    activeFilters.variacion = 'Todas';
+                    updateDropdownUI('variacion', 'Todas', 'Variación');
+                } else if (type === 'moneda') {
+                    activeFilters.moneda = 'Todas';
+                    updateDropdownUI('moneda', 'Todas', 'Moneda');
+                } else if (type === 'soloOperados') {
+                    activeFilters.soloOperados = false;
+                    document.getElementById('chk-operados').checked = false;
+                }
+                
+                renderChips();
+            });
+
+            // Interacción Pestañas Categoría Principal
+            const filterPills = document.querySelectorAll('.filter-pill');
+            filterPills.forEach(pill => {
+                pill.addEventListener('click', (e) => {
+                    filterPills.forEach(p => {
+                        p.classList.remove('bg-blue-50', 'text-brand-active', 'border-blue-200');
+                        p.classList.add('bg-white', 'text-gray-600', 'border-gray-300', 'hover:bg-gray-50');
+                    });
+                    const target = e.currentTarget;
+                    target.classList.remove('bg-white', 'text-gray-600', 'border-gray-300', 'hover:bg-gray-50');
+                    target.classList.add('bg-blue-50', 'text-brand-active', 'border-blue-200');
+                    
+                    activeFilters.categoria = target.textContent.trim();
+                    renderChips();
+                });
+            });
+
+            // Interacción Dropdowns Principales
+            document.querySelectorAll('.filter-dropdown-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const type = item.dataset.type;
+                    const value = item.dataset.value;
+                    const btn = document.getElementById(`btn-${type}`);
+
+                    activeFilters[type] = value;
+
+                    const siblings = item.parentElement.querySelectorAll('.filter-dropdown-item');
+                    siblings.forEach(sib => {
+                        sib.classList.remove('text-brand-active', 'bg-blue-50', 'font-medium');
+                        sib.classList.add('text-gray-700');
+                    });
+                    item.classList.remove('text-gray-700');
+                    item.classList.add('text-brand-active', 'bg-blue-50', 'font-medium');
+
+                    let defaultText = '';
+                    if (type === 'plazo') defaultText = 'Plazo: 24h';
+                    if (type === 'variacion') defaultText = 'Variación';
+                    if (type === 'moneda') defaultText = 'Moneda';
+
+                    if (value && value !== 'Todas') {
+                        btn.innerHTML = `${type === 'plazo' ? 'Plazo: ' + value : value} <i class="ph ph-caret-down"></i>`;
+                        btn.classList.add('border-brand-active', 'text-brand-active', 'bg-blue-50');
+                        btn.classList.remove('border-gray-300', 'text-gray-600', 'bg-white', 'hover:bg-gray-50');
+                    } else {
+                        btn.innerHTML = `${defaultText} <i class="ph ph-caret-down"></i>`;
+                        btn.classList.remove('border-brand-active', 'text-brand-active', 'bg-blue-50');
+                        btn.classList.add('border-gray-300', 'text-gray-600', 'bg-white', 'hover:bg-gray-50');
+                    }
+
+                    renderChips();
+                });
+            });
+
+            // Checkbox Operados Principal
+            document.getElementById('chk-operados').addEventListener('change', (e) => {
+                activeFilters.soloOperados = e.target.checked;
+                renderChips();
+            });
+
+            // Render Inicial de Chips
+            renderChips();
+
+            // --- SCROLL Y FULLSCREEN NATIVO ---
+            const handleScroll = () => {
+                // Sombra de Top Nav
+                if (window.scrollY > 10 && !isScrolled) {
+                    isScrolled = true;
+                    document.body.classList.add('scrolled');
+                } else if (window.scrollY <= 10 && isScrolled) {
+                    isScrolled = false;
+                    document.body.classList.remove('scrolled');
+                }
+
+                // Control Barra Filtros Reducida
+                const filtersContainer = document.getElementById('main-filters-container');
+                if (filtersContainer) {
+                    const rect = filtersContainer.getBoundingClientRect();
+                    const offset = 64; 
+                    if (rect.bottom < offset && !areFiltersScrolled) {
+                        areFiltersScrolled = true;
+                        document.body.classList.add('filters-scrolled');
+                    } else if (rect.bottom >= offset && areFiltersScrolled) {
+                        areFiltersScrolled = false;
+                        document.body.classList.remove('filters-scrolled');
+                    }
+                }
+            };
+            window.addEventListener('scroll', handleScroll, { passive: true });
+            handleScroll();
+
+            const updateFullscreenUI = (isFull) => {
+                document.querySelectorAll('.btn-fullscreen').forEach(btn => {
+                    if (isFull) {
+                        btn.innerHTML = '<i class="ph ph-corners-in text-[16px]"></i>';
+                        btn.setAttribute('title', 'Salir de pantalla completa (F11 u Opc+Cmd+F)');
+                    } else {
+                        btn.innerHTML = '<i class="ph ph-corners-out text-[16px]"></i>';
+                        btn.setAttribute('title', 'Ver en pantalla completa (F11 u Opc+Cmd+F)');
+                    }
+                });
+            };
+
+            const toggleFullscreen = async () => {
+                try {
+                    if (!document.fullscreenElement) {
+                        await document.documentElement.requestFullscreen();
+                    } else {
+                        if (document.exitFullscreen) {
+                            await document.exitFullscreen();
+                        }
+                    }
+                } catch (err) {
+                    console.warn(`No se pudo activar pantalla completa (bloqueado por iframe de vista previa). Esto funcionará correctamente en tu entorno de producción: ${err.message}`);
+                }
+            };
+
+            document.addEventListener('fullscreenchange', () => {
+                const isFull = !!document.fullscreenElement;
+                updateFullscreenUI(isFull);
+            });
+
+            document.querySelectorAll('.btn-fullscreen').forEach(btn => {
+                btn.addEventListener('click', toggleFullscreen);
+            });
+        });
+    </script>
+</body>
+</html>
