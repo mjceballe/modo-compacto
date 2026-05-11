@@ -122,7 +122,7 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding: 0 2rem;
+            padding: 0 16px;
             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             flex-shrink: 0;
         }
@@ -150,7 +150,18 @@
             border-bottom-color: #e5e7eb;
         }
 
-        /* 5. Thead Sticky Escalonado */
+        /* 5. Contenedor de la tabla dinámico */
+        .table-wrapper {
+            transition: padding-left 0.3s ease, padding-right 0.3s ease;
+        }
+
+        /* Quita los paddings laterales al hacer scroll */
+        body.filters-scrolled .table-wrapper {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+
+        /* 6. Thead Sticky Escalonado */
         .sticky-thead {
             position: -webkit-sticky;
             position: sticky;
@@ -180,7 +191,7 @@
 
         .main-content-wrapper {
             flex-grow: 1;
-            padding: 2rem;
+            padding: 2rem 16px;
             width: 100%;
             min-width: 1200px;
             max-width: 1792px;
@@ -198,7 +209,7 @@
         body.is-fullscreen footer, body.is-fullscreen-simulated footer { display: none !important; }
         
         body.is-fullscreen .main-content-wrapper, body.is-fullscreen-simulated .main-content-wrapper { 
-            padding: 2rem !important; 
+            padding: 2rem 16px !important; 
             width: 100% !important; 
             min-width: 1200px !important; 
             max-width: 1792px !important; 
@@ -212,7 +223,7 @@
 <body class="text-text-main text-sm">
 
     <!-- Fila 1: Top Nav (Sticky Nativamente) -->
-    <header id="top-nav" class="w-full flex justify-center">
+    <header id="top-nav" class="w-full flex justify-center border-b border-gray-200">
         <div class="flex items-center justify-between px-8 h-16 w-full max-w-[1792px]">
             <div class="flex items-center h-8">
                 <!-- Menú Hamburguesa -->
@@ -362,7 +373,7 @@
 
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col flex-grow">
             <!-- Pestañas Principales -->
-            <div class="flex px-8 border-b border-gray-200 shrink-0">
+            <div class="flex px-4 border-b border-gray-200 shrink-0">
                 <button class="px-4 py-3 text-brand-active font-medium border-b-2 border-brand-active text-sm">BYMA</button>
                 <button class="px-4 py-3 text-gray-500 hover:text-gray-800 font-medium text-sm">A3</button>
                 <button class="px-4 py-3 text-gray-500 hover:text-gray-800 font-medium text-sm">Mercado USA</button>
@@ -371,7 +382,7 @@
             </div>
             
             <!-- Pestañas Secundarias (Categorías) -->
-            <div class="px-8 mt-4 flex gap-2 overflow-x-auto shrink-0">
+            <div class="px-4 mt-4 flex gap-2 overflow-x-auto shrink-0">
                 <button class="filter-pill px-4 py-1.5 bg-blue-50 text-brand-active rounded-full text-xs font-medium border border-blue-200">Líderes</button>
                 <button class="filter-pill px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">General</button>
                 <button class="filter-pill px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">Opciones</button>
@@ -386,7 +397,7 @@
             </div>
             
             <!-- Barra de Filtros interactiva -->
-            <div id="main-filters-container" class="px-8 mt-4 flex items-center justify-between shrink-0 relative z-[45]">
+            <div id="main-filters-container" class="px-4 mt-4 flex items-center justify-between shrink-0 relative z-[45]">
                 <div class="flex items-center gap-3">
                     <div class="relative w-64">
                         <i class="ph ph-magnifying-glass absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
@@ -448,18 +459,17 @@
                 </div>
             </div>
             
-            <!-- Tabla Principal -->
-            <div class="px-8 mt-4 mb-4 flex-grow relative">
+            <!-- Tabla Principal con transición de paddings laterales -->
+            <div class="table-wrapper px-4 mt-4 mb-4 flex-grow relative">
                 <table class="w-full data-table text-[11px] text-right">
                     <thead class="sticky-thead text-gray-700 shadow-sm">
                         <tr>
-                            <th colspan="6" class="bg-brand-headerBg"></th>
+                            <th colspan="5" class="bg-brand-headerBg"></th>
                             <th colspan="2" class="bg-brand-headerVenderBg text-center text-[11px] font-bold py-1">VENDER</th>
                             <th colspan="2" class="bg-brand-headerComprarBg text-center text-[11px] font-bold py-1">COMPRAR</th>
                             <th colspan="6" class="bg-brand-headerBg"></th>
                         </tr>
                         <tr class="font-medium text-gray-600">
-                            <th class="w-8 px-2 text-center py-2 bg-brand-headerBg"></th>
                             <th class="w-8 px-2 text-center py-2 bg-brand-headerBg"></th>
                             <th class="text-left px-2 py-2 bg-brand-headerBg">Especie <i class="ph ph-arrows-down-up text-[10px] ml-1"></i></th>
                             <th class="text-left px-2 py-2 bg-brand-headerBg">Plazo</th>
@@ -500,7 +510,6 @@
                                 const starWeight = row.fav ? 'weight="fill"' : '';
                                 document.write(`
                                     <tr class="bg-white">
-                                        <td class="px-2 text-center text-gray-300"><i class="ph ph-dots-six-vertical cursor-grab"></i></td>
                                         <td class="px-2 text-center"><i class="ph ${starClass} text-sm cursor-pointer" ${starWeight}></i></td>
                                         <td class="px-2 text-left font-bold text-gray-800">${row.esp}</td>
                                         <td class="px-2 text-left font-bold">${row.plazo} ${arrowIndic}</td>
@@ -598,7 +607,6 @@
                 
                 const createChip = (label, type) => {
                     const chip = document.createElement('div');
-                    // Estilos del chip: px-2 aplica 8px de padding a la izquierda y derecha exactamente
                     chip.className = 'flex items-center h-[20px] px-2 bg-white border border-[#D5D7DD] rounded-full text-[#676C7E] text-[11px] font-medium gap-1 cursor-default box-border';
                     
                     let chipHTML = `<span class="leading-none flex items-center">${label}</span>`;
