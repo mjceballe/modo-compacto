@@ -82,7 +82,7 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding: 0 2rem; /* 32px lateral */
+            padding: 0 16px;
             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             flex-shrink: 0;
         }
@@ -91,39 +91,22 @@
         .data-table thead tr:nth-child(1) { height: var(--thead-top); min-height: var(--thead-top); max-height: var(--thead-top); }
         .data-table thead tr:nth-child(2) { height: var(--thead-bottom); min-height: var(--thead-bottom); max-height: var(--thead-bottom); }
 
-        .data-table td, .data-table th {
-            padding-top: 0;
-            padding-bottom: 0;
-            vertical-align: middle;
-            white-space: nowrap;
-        }
-
+        .data-table td, .data-table th { padding-top: 0; padding-bottom: 0; vertical-align: middle; white-space: nowrap; }
         .data-table { border-collapse: separate; border-spacing: 0; }
+        
         .data-table thead tr:first-child th { border-top: 1px solid #e5e7eb; }
         .data-table tbody tr { background-color: #ffffff; }
         .data-table tbody td, .data-table thead tr:nth-child(2) th { border-bottom: 1px solid #e5e7eb; }
+
         .data-table tbody tr:hover td:not(.bg-brand-venderBg):not(.bg-brand-comprarBg) { background-color: #f9fafb; }
 
-        .variation-pill {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            height: 16px;
-            padding: 0 6px;
-            border-radius: 9999px;
-            font-weight: 500;
-        }
+        .variation-pill { display: inline-flex; align-items: center; justify-content: center; height: 16px; padding: 0 6px; border-radius: 9999px; font-weight: 500; }
         .variation-pos { background-color: #def7ec; color: #046c4e; }
         .variation-neg { background-color: #fde8e8; color: #9b1c1c; }
 
-        .table-scroll-container::-webkit-scrollbar { width: 8px; height: 8px; }
-        .table-scroll-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
-        .table-scroll-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        .table-scroll-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
         .main-content-wrapper {
             flex-grow: 1;
-            padding: 2rem; /* 32px general */
+            padding: 2rem 16px;
             width: 100%;
             min-width: 1200px;
             max-width: 1792px;
@@ -137,8 +120,8 @@
 
     <header class="fixed-header flex flex-col">
         <!-- Fila 1: Top Nav -->
-        <div class="w-full shrink-0 flex justify-center">
-            <div class="flex items-center justify-between px-8 h-16 w-full max-w-[1792px]">
+        <div class="w-full shrink-0 flex justify-center h-16">
+            <div class="flex items-center justify-between px-8 h-full w-full max-w-[1792px]">
                 <div class="flex items-center h-8">
                     <div class="flex items-center h-full">
                         <svg width="146" height="40" viewBox="0 0 146 40" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -150,10 +133,12 @@
                         </svg>
                     </div>
                 </div>
-                <div class="w-[600px] shrink-0 mx-8 relative flex items-center h-8">
+                
+                <div class="flex-1 max-w-[600px] mx-4 lg:mx-8 relative flex items-center h-8">
                     <i class="ph ph-magnifying-glass absolute left-4 text-gray-500 text-lg font-bold"></i>
                     <input type="text" placeholder="Buscá un instrumento" class="w-full h-full pl-11 pr-4 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:border-brand-active focus:ring-1 focus:ring-brand-active">
                 </div>
+
                 <div class="flex items-center gap-2 h-8">
                     <button class="text-gray-600 hover:text-gray-900 transition-colors flex items-center justify-center h-full w-8"><i class="ph ph-question text-2xl"></i></button>
                     <button class="text-gray-600 hover:text-gray-900 transition-colors relative flex items-center justify-center h-full w-8">
@@ -171,8 +156,8 @@
         </div>
 
         <!-- Fila 2: Main Nav -->
-        <div class="w-full border-b border-gray-200 shrink-0 flex justify-center">
-            <div class="flex justify-between px-8 h-16 w-full max-w-[1792px]">
+        <div class="w-full border-b border-gray-200 shrink-0 flex justify-center h-16">
+            <div class="flex justify-between px-8 h-full w-full max-w-[1792px]">
                 <nav class="flex items-end h-full gap-1">
                     <a href="#" class="relative h-12 flex flex-col justify-start group"><span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors">Inicio</span></a>
                     <a href="#" class="relative h-12 flex flex-col justify-start">
@@ -184,30 +169,21 @@
                     <a href="#" class="relative h-12 flex flex-col justify-start group"><span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors">Actividad</span></a>
                     <a href="#" class="relative h-12 flex flex-col justify-start group"><span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors gap-1">Cuenta <i class="ph ph-caret-down text-sm"></i></span></a>
                     
+                    <!-- Tab Versiones (Dropdown) -->
                     <div class="relative h-12 flex flex-col justify-start group">
-                        <button class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors gap-1 outline-none">Versión 0 <i class="ph ph-caret-down text-sm"></i></button>
+                        <button class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors gap-1 outline-none">
+                            Versión 0 <i class="ph ph-caret-down text-sm"></i>
+                        </button>
                         <div class="absolute top-10 left-0 w-56 bg-white border border-gray-200 rounded-lg shadow-xl hidden group-hover:block z-[100] overflow-hidden">
-                        <a href="index.html" class="block px-4 py-2.5 text-[13px] text-brand-active bg-gray-50 font-medium hover:bg-gray-100 border-b border-gray-100 transition-colors">
-                            Versión 0 (Cambios mín.)
-                        </a>
-                        <a href="mercados_v1.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">
-                            Versión 1 (Scroll)
-                        </a>
-                        <a href="mercados_v2.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">
-                            Versión 2 (Sticky)
-                        </a>
-                        <a href="mercados_v3.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">
-                            Versión 3 (Expandir card)
-                        </a>
-                        <a href="mercados_v4.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active transition-colors">
-                            Versión 4 (Unificada)
-                        </a>
-                        <a href="mercados_v5.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active transition-colors">
-                            Versión 5 (Chips)
-                        </a>
+                            <a href="index.html" class="block px-4 py-2.5 text-[13px] text-brand-active bg-gray-50 font-medium hover:bg-gray-100 border-b border-gray-100 transition-colors">Versión 0 (Original)</a>
+                            <a href="mercados_v1.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">Versión 1 (Scroll)</a>
+                            <a href="mercados_v2.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">Versión 2 (Sticky)</a>
+                            <a href="mercados_v3.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">Versión 3 (Expandir card)</a>
+                            <a href="mercados_v4.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">Versión 4 (Unificada)</a>
+                            <a href="mercados_v5.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active transition-colors">Versión 5 (chips)</a>
+                        </div>
                     </div>
-                </div>
-            </nav>
+                </nav>
                 <div class="flex items-center h-full">
                     <div class="border border-blue-600 bg-blue-50/50 rounded-full px-5 h-8 flex items-center text-[13px] text-gray-800 font-medium tracking-wide">
                         CC 125780 | Pérez, Juan C...
@@ -217,8 +193,8 @@
         </div>
 
         <!-- Fila 3: Balance Bar -->
-        <div class="w-full bg-[#f8fafc] border-b border-gray-100 shadow-[0_4px_6px_-6px_rgba(0,0,0,0.1)] shrink-0 flex justify-center">
-            <div class="flex items-center justify-between px-8 h-16 w-full max-w-[1792px]">
+        <div class="w-full bg-[#f8fafc] border-b border-gray-100 shadow-[0_4px_6px_-6px_rgba(0,0,0,0.1)] shrink-0 flex justify-center h-16">
+            <div class="flex items-center justify-between px-8 h-full w-full max-w-[1792px]">
                 <div class="flex items-center h-8">
                     <span class="text-[14px] font-semibold text-gray-800 mr-5 flex items-center h-full">Disponible para operar</span>
                     <div class="flex items-center bg-white border border-gray-300 rounded-lg overflow-hidden text-xs font-medium p-[2px] h-full">
@@ -250,18 +226,16 @@
             <h1 class="text-2xl font-bold text-gray-800">Mercados</h1>
         </div>
 
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col flex-grow overflow-hidden">
-            <!-- Pestañas Principales (32px padding horizontal) -->
-            <div class="flex px-8 border-b border-gray-200 shrink-0">
+        <!-- TABS & FILTERS CARD -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col mb-8">
+            <div class="flex px-4 border-b border-gray-200 shrink-0">
                 <button class="px-4 py-3 text-brand-active font-medium border-b-2 border-brand-active text-sm">BYMA</button>
                 <button class="px-4 py-3 text-gray-500 hover:text-gray-800 font-medium text-sm">A3</button>
                 <button class="px-4 py-3 text-gray-500 hover:text-gray-800 font-medium text-sm">Mercado USA</button>
                 <button class="px-4 py-3 text-gray-500 hover:text-gray-800 font-medium text-sm flex items-center gap-1"><i class="ph ph-star"></i> Favoritos</button>
                 <button class="px-4 py-3 text-gray-500 hover:text-gray-800 font-medium text-sm flex items-center gap-1"><i class="ph ph-thumbs-up"></i> Recomendados</button>
             </div>
-            
-            <!-- Pestañas Secundarias (32px padding horizontal) -->
-            <div class="px-8 mt-4 flex gap-2 overflow-x-auto shrink-0">
+            <div class="px-4 mt-4 flex gap-2 overflow-x-auto shrink-0">
                 <button class="px-4 py-1.5 bg-blue-50 text-brand-active rounded-full text-xs font-medium border border-blue-200">Líderes</button>
                 <button class="px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">General</button>
                 <button class="px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">Opciones</button>
@@ -274,9 +248,7 @@
                 <button class="px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">Índices</button>
                 <button class="px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">Futuros</button>
             </div>
-            
-            <!-- Barra de Filtros (32px padding horizontal) -->
-            <div class="px-8 mt-4 flex items-center justify-between shrink-0">
+            <div class="px-4 mt-4 mb-4 flex items-center justify-between shrink-0">
                 <div class="flex items-center gap-3">
                     <div class="relative w-64">
                         <i class="ph ph-magnifying-glass absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
@@ -293,85 +265,84 @@
                 </div>
                 <button class="text-gray-500 hover:text-gray-700"><i class="ph ph-download-simple text-lg"></i></button>
             </div>
-            
-            <!-- Contenedor de la Tabla (32px padding horizontal) -->
-            <div class="px-8 mt-4 mb-4 overflow-auto table-scroll-container flex-grow relative">
-                <table class="w-full data-table text-[11px] text-right">
-                    <thead class="sticky top-0 z-10 text-gray-700 shadow-sm">
-                        <tr>
-                            <th colspan="6" class="bg-brand-headerBg"></th>
-                            <th colspan="2" class="bg-brand-headerVenderBg text-center text-[11px] font-bold py-1">VENDER</th>
-                            <th colspan="2" class="bg-brand-headerComprarBg text-center text-[11px] font-bold py-1">COMPRAR</th>
-                            <th colspan="6" class="bg-brand-headerBg"></th>
-                        </tr>
-                        <tr class="font-medium text-gray-600">
-                            <th class="w-8 px-2 text-center py-2 bg-brand-headerBg"></th>
-                            <th class="w-8 px-2 text-center py-2 bg-brand-headerBg"></th>
-                            <th class="text-left px-2 py-2 bg-brand-headerBg">Especie <i class="ph ph-arrows-down-up text-[10px] ml-1"></i></th>
-                            <th class="text-left px-2 py-2 bg-brand-headerBg">Plazo</th>
-                            <th class="px-2 py-2 bg-brand-headerBg">Último <i class="ph ph-arrows-down-up text-[10px] ml-1"></i></th>
-                            <th class="px-2 py-2 bg-brand-headerBg">Var. % <i class="ph ph-arrows-down-up text-[10px] ml-1"></i></th>
-                            <th class="px-2 py-2 bg-brand-headerVenderBg">CC</th>
-                            <th class="px-2 py-2 bg-brand-headerVenderBg">PC</th>
-                            <th class="px-2 py-2 bg-brand-headerComprarBg">PV</th>
-                            <th class="px-2 py-2 bg-brand-headerComprarBg">CV</th>
-                            <th class="px-2 py-2 bg-brand-headerBg">Cierre</th>
-                            <th class="px-2 py-2 bg-brand-headerBg">Mín.</th>
-                            <th class="px-2 py-2 bg-brand-headerBg">Máx.</th>
-                            <th class="px-2 py-2 bg-brand-headerBg">Cant. op. <i class="ph ph-arrows-down-up text-[10px] ml-1"></i></th>
-                            <th class="px-2 py-2 bg-brand-headerBg">Volumen <i class="ph ph-arrows-down-up text-[10px] ml-1"></i></th>
-                            <th class="px-2 py-2 pr-4 bg-brand-headerBg">Hora</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-gray-700 bg-white">
-                        <script>
-                            const data = [
-                                { esp: 'ALUA', plazo: '24h', ult: '34.557,92', var: 2.12, cc: '35.021', pc: '34.557,92', pv: '34.557,92', cv: '56.789', hora: '12:45:29', fav: false },
-                                { esp: 'YPFD', plazo: '24h', ult: '12.345,67', var: -0.12, cc: '78.221', pc: '12.345,67', pv: '12.352,67', cv: '92.345', hora: '12:45:29', fav: false },
-                                { esp: 'GGAL', plazo: '24h', ult: '34.557,92', var: 2.12, cc: '12.345', pc: '25.755,43', pv: '25.755,43', cv: '67.890', hora: '12:45:29', fav: false },
-                                { esp: 'YPFD', plazo: '24h', ult: '12.345,67', var: -0.12, cc: '87.654', pc: '25.755,43', pv: '45.727,31', cv: '81.234', hora: '12:45:29', fav: false },
-                                { esp: 'PAMP', plazo: '24h', ult: '25.755,43', var: -0.12, cc: '65.432', pc: '38.789,11', pv: '23.456,78', cv: '72.456', hora: '12:45:29', fav: false },
-                                { esp: 'BMA',  plazo: '24h', ult: '38.789,11', var: 2.12, cc: '12.345', pc: '23.456,78', pv: '87.652,34', cv: '92.345', hora: '12:45:29', fav: false },
-                                { esp: 'CRES', plazo: '24h', ult: '23.456,78', var: 2.12, cc: '65.432', pc: '23.456,78', pv: '25.755,43', cv: '72.456', hora: '12:45:29', fav: true },
-                                { esp: 'LOMA', plazo: '24h', ult: '87.654,32', var: 2.12, cc: '45.678', pc: '87.654,32', pv: '87.652,34', cv: '49.876', hora: '12:45:29', fav: false },
-                            ];
-                            const fullData = [...data, ...data, ...data, ...data, ...data, ...data, ...data, ...data];
-                            fullData.forEach((row, i) => {
-                                const isPos = row.var > 0;
-                                const varClass = isPos ? 'variation-pos' : 'variation-neg';
-                                const varIcon = isPos ? 'ph-arrow-up' : 'ph-arrow-down';
-                                const showPlazoArrow = (i % 2 === 0);
-                                const arrowIndic = showPlazoArrow ? (isPos ? '<i class="ph ph-arrow-up text-green-500 font-bold ml-1"></i>' : '<i class="ph ph-arrow-down text-red-500 font-bold ml-1"></i>') : '';
-                                const starClass = row.fav ? 'ph-star text-brand-active fill-current' : 'ph-star text-gray-300';
-                                const starWeight = row.fav ? 'weight="fill"' : '';
-                                document.write(`
-                                    <tr class="bg-white">
-                                        <td class="px-2 text-center text-gray-300"><i class="ph ph-dots-six-vertical cursor-grab"></i></td>
-                                        <td class="px-2 text-center"><i class="ph ${starClass} text-sm cursor-pointer" ${starWeight}></i></td>
-                                        <td class="px-2 text-left font-bold text-gray-800">${row.esp}</td>
-                                        <td class="px-2 text-left font-bold">${row.plazo} ${arrowIndic}</td>
-                                        <td class="px-2">${row.ult}</td>
-                                        <td class="px-2"><span class="variation-pill ${varClass}"><i class="ph ${varIcon} mr-0.5"></i> ${Math.abs(row.var)}%</span></td>
-                                        <td class="px-2 bg-brand-venderBg">${row.cc}</td>
-                                        <td class="px-2 bg-brand-venderBg">${row.pc}</td>
-                                        <td class="px-2 bg-brand-comprarBg">${row.pv}</td>
-                                        <td class="px-2 bg-brand-comprarBg">${row.cv}</td>
-                                        <td class="px-2 text-gray-500">34.557,92</td>
-                                        <td class="px-2 text-gray-500">34.557,92</td>
-                                        <td class="px-2 text-gray-500">34.557,92</td>
-                                        <td class="px-2 text-gray-500">50.123.456</td>
-                                        <td class="px-2 text-gray-500">50.123.456</td>
-                                        <td class="px-2 pr-4 text-gray-800">${row.hora}</td>
-                                    </tr>
-                                `);
-                            });
-                        </script>
-                    </tbody>
-                </table>
-            </div>
+        </div>
+
+        <!-- TABLE CARD -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col flex-grow w-full">
+            <table class="w-full data-table text-[11px] text-right">
+                <thead class="sticky top-[192px] z-40 text-gray-700 shadow-sm">
+                    <tr>
+                        <th colspan="5" class="bg-brand-headerBg"></th>
+                        <th colspan="2" class="bg-brand-headerVenderBg text-center text-[11px] font-bold py-1">VENDER</th>
+                        <th colspan="2" class="bg-brand-headerComprarBg text-center text-[11px] font-bold py-1">COMPRAR</th>
+                        <th colspan="6" class="bg-brand-headerBg"></th>
+                    </tr>
+                    <tr class="font-medium text-gray-600">
+                        <th class="w-8 px-2 text-center py-2 bg-brand-headerBg"></th>
+                        <th class="text-left px-2 py-2 bg-brand-headerBg">Especie <i class="ph ph-arrows-down-up text-[10px] ml-1"></i></th>
+                        <th class="text-left px-2 py-2 bg-brand-headerBg">Plazo</th>
+                        <th class="px-2 py-2 bg-brand-headerBg">Último <i class="ph ph-arrows-down-up text-[10px] ml-1"></i></th>
+                        <th class="px-2 py-2 bg-brand-headerBg">Var. % <i class="ph ph-arrows-down-up text-[10px] ml-1"></i></th>
+                        <th class="px-2 py-2 bg-brand-headerVenderBg">CC</th>
+                        <th class="px-2 py-2 bg-brand-headerVenderBg">PC</th>
+                        <th class="px-2 py-2 bg-brand-headerComprarBg">PV</th>
+                        <th class="px-2 py-2 bg-brand-headerComprarBg">CV</th>
+                        <th class="px-2 py-2 bg-brand-headerBg">Cierre</th>
+                        <th class="px-2 py-2 bg-brand-headerBg">Mín.</th>
+                        <th class="px-2 py-2 bg-brand-headerBg">Máx.</th>
+                        <th class="px-2 py-2 bg-brand-headerBg">Cant. op. <i class="ph ph-arrows-down-up text-[10px] ml-1"></i></th>
+                        <th class="px-2 py-2 bg-brand-headerBg">Volumen <i class="ph ph-arrows-down-up text-[10px] ml-1"></i></th>
+                        <th class="px-2 py-2 pr-4 bg-brand-headerBg">Hora</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-700 bg-white">
+                    <script>
+                        const data = [
+                            { esp: 'ALUA', plazo: '24h', ult: '34.557,92', var: 2.12, cc: '35.021', pc: '34.557,92', pv: '34.557,92', cv: '56.789', hora: '12:45:29', fav: false },
+                            { esp: 'YPFD', plazo: '24h', ult: '12.345,67', var: -0.12, cc: '78.221', pc: '12.345,67', pv: '12.352,67', cv: '92.345', hora: '12:45:29', fav: false },
+                            { esp: 'GGAL', plazo: '24h', ult: '34.557,92', var: 2.12, cc: '12.345', pc: '25.755,43', pv: '25.755,43', cv: '67.890', hora: '12:45:29', fav: false },
+                            { esp: 'YPFD', plazo: '24h', ult: '12.345,67', var: -0.12, cc: '87.654', pc: '25.755,43', pv: '45.727,31', cv: '81.234', hora: '12:45:29', fav: false },
+                            { esp: 'PAMP', plazo: '24h', ult: '25.755,43', var: -0.12, cc: '65.432', pc: '38.789,11', pv: '23.456,78', cv: '72.456', hora: '12:45:29', fav: false },
+                            { esp: 'BMA',  plazo: '24h', ult: '38.789,11', var: 2.12, cc: '12.345', pc: '23.456,78', pv: '87.652,34', cv: '92.345', hora: '12:45:29', fav: false },
+                            { esp: 'CRES', plazo: '24h', ult: '23.456,78', var: 2.12, cc: '65.432', pc: '23.456,78', pv: '25.755,43', cv: '72.456', hora: '12:45:29', fav: true },
+                            { esp: 'LOMA', plazo: '24h', ult: '87.654,32', var: 2.12, cc: '45.678', pc: '87.654,32', pv: '87.652,34', cv: '49.876', hora: '12:45:29', fav: false },
+                        ];
+                        const fullData = [...data, ...data, ...data, ...data, ...data, ...data, ...data, ...data];
+                        fullData.forEach((row, i) => {
+                            const isPos = row.var > 0;
+                            const varClass = isPos ? 'variation-pos' : 'variation-neg';
+                            const varIcon = isPos ? 'ph-arrow-up' : 'ph-arrow-down';
+                            const showPlazoArrow = (i % 2 === 0);
+                            const arrowIndic = showPlazoArrow ? (isPos ? '<i class="ph ph-arrow-up text-green-500 font-bold ml-1"></i>' : '<i class="ph ph-arrow-down text-red-500 font-bold ml-1"></i>') : '';
+                            const starClass = row.fav ? 'ph-star text-brand-active fill-current' : 'ph-star text-gray-300';
+                            const starWeight = row.fav ? 'weight="fill"' : '';
+                            document.write(`
+                                <tr class="bg-white">
+                                    <td class="px-2 text-center"><i class="ph ${starClass} text-sm cursor-pointer" ${starWeight}></i></td>
+                                    <td class="px-2 text-left font-bold text-gray-800">${row.esp}</td>
+                                    <td class="px-2 text-left font-bold">${row.plazo} ${arrowIndic}</td>
+                                    <td class="px-2">${row.ult}</td>
+                                    <td class="px-2"><span class="variation-pill ${varClass}"><i class="ph ${varIcon} mr-0.5"></i> ${Math.abs(row.var)}%</span></td>
+                                    <td class="px-2 bg-brand-venderBg">${row.cc}</td>
+                                    <td class="px-2 bg-brand-venderBg">${row.pc}</td>
+                                    <td class="px-2 bg-brand-comprarBg">${row.pv}</td>
+                                    <td class="px-2 bg-brand-comprarBg">${row.cv}</td>
+                                    <td class="px-2 text-gray-500">34.557,92</td>
+                                    <td class="px-2 text-gray-500">34.557,92</td>
+                                    <td class="px-2 text-gray-500">34.557,92</td>
+                                    <td class="px-2 text-gray-500">50.123.456</td>
+                                    <td class="px-2 text-gray-500">50.123.456</td>
+                                    <td class="px-2 pr-4 text-gray-800">${row.hora}</td>
+                                </tr>
+                            `);
+                        });
+                    </script>
+                </tbody>
+            </table>
         </div>
     </main>
 
+    <!-- FOOTER -->
     <footer class="bg-brand-footer text-white mt-auto w-full flex justify-center">
         <div class="flex justify-between items-center w-full max-w-[1792px] py-3 px-8 text-xs">
             <span class="text-blue-200">Versión: 3.18.3</span>
