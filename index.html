@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gallo - Mercados</title>
+    <title>Gallo - Mercados Cambios mín.</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Phosphor Icons -->
@@ -55,14 +55,11 @@
             min-width: 1200px;
         }
 
-        .fixed-header {
-            position: sticky;
-            top: 0;
-            z-index: 50;
+        /* HEADER ESTÁTICO (Sin sticky) */
+        .static-header {
             width: 100%;
             height: var(--header-height);
             min-height: var(--header-height);
-            max-height: var(--header-height);
             box-sizing: border-box;
             background-color: white;
             display: flex;
@@ -71,14 +68,15 @@
             flex-shrink: 0;
         }
 
-        .fixed-title-card {
+        /* Tarjeta de título con padding de 16px */
+        .title-card {
             height: var(--title-height);
             min-height: var(--title-height);
             max-height: var(--title-height);
             box-sizing: border-box;
             background-color: white;
             border-radius: 0.5rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -87,6 +85,7 @@
             flex-shrink: 0;
         }
 
+        /* Tabla sin esquinas redondeadas y thead estático */
         .data-table tbody tr { height: var(--row-height); min-height: var(--row-height); max-height: var(--row-height); }
         .data-table thead tr:nth-child(1) { height: var(--thead-top); min-height: var(--thead-top); max-height: var(--thead-top); }
         .data-table thead tr:nth-child(2) { height: var(--thead-bottom); min-height: var(--thead-bottom); max-height: var(--thead-bottom); }
@@ -104,6 +103,7 @@
         .variation-pos { background-color: #def7ec; color: #046c4e; }
         .variation-neg { background-color: #fde8e8; color: #9b1c1c; }
 
+        /* Contenedor principal con paddings laterales de 16px */
         .main-content-wrapper {
             flex-grow: 1;
             padding: 2rem 16px;
@@ -118,7 +118,7 @@
 </head>
 <body class="text-text-main text-sm">
 
-    <header class="fixed-header flex flex-col">
+    <header class="static-header">
         <!-- Fila 1: Top Nav -->
         <div class="w-full shrink-0 flex justify-center h-16">
             <div class="flex items-center justify-between px-8 h-full w-full max-w-[1792px]">
@@ -156,7 +156,7 @@
         </div>
 
         <!-- Fila 2: Main Nav -->
-        <div class="w-full border-b border-gray-200 shrink-0 flex justify-center h-16">
+        <div class="w-full border-b border-gray-200 shrink-0 flex justify-center h-16 bg-white">
             <div class="flex justify-between px-8 h-full w-full max-w-[1792px]">
                 <nav class="flex items-end h-full gap-1">
                     <a href="#" class="relative h-12 flex flex-col justify-start group"><span class="h-9 px-4 flex items-center justify-center text-gray-600 group-hover:text-brand-active text-[14px] font-medium transition-colors">Inicio</span></a>
@@ -175,7 +175,7 @@
                             Versión 0 <i class="ph ph-caret-down text-sm"></i>
                         </button>
                         <div class="absolute top-10 left-0 w-56 bg-white border border-gray-200 rounded-lg shadow-xl hidden group-hover:block z-[100] overflow-hidden">
-                            <a href="index.html" class="block px-4 py-2.5 text-[13px] text-brand-active bg-gray-50 font-medium hover:bg-gray-100 border-b border-gray-100 transition-colors">Versión 0 (Original)</a>
+                            <a href="index.html" class="block px-4 py-2.5 text-[13px] text-brand-active bg-gray-50 font-medium hover:bg-gray-100 border-b border-gray-100 transition-colors">Versión 0 (Cambios mín.)</a>
                             <a href="mercados_v1.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">Versión 1 (Scroll)</a>
                             <a href="mercados_v2.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">Versión 2 (Sticky)</a>
                             <a href="mercados_v3.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">Versión 3 (Expandir card)</a>
@@ -216,7 +216,7 @@
     </header>
 
     <main class="main-content-wrapper">
-        <div class="fixed-title-card">
+        <div class="title-card">
             <div class="flex items-center text-xs text-brand-active mb-1 gap-1">
                 <i class="ph ph-house"></i>
                 <a href="#" class="hover:underline">Inicio</a>
@@ -227,7 +227,7 @@
         </div>
 
         <!-- TABS & FILTERS CARD -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col mb-8">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col mb-8 w-full">
             <div class="flex px-4 border-b border-gray-200 shrink-0">
                 <button class="px-4 py-3 text-brand-active font-medium border-b-2 border-brand-active text-sm">BYMA</button>
                 <button class="px-4 py-3 text-gray-500 hover:text-gray-800 font-medium text-sm">A3</button>
@@ -270,7 +270,7 @@
         <!-- TABLE CARD -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col flex-grow w-full">
             <table class="w-full data-table text-[11px] text-right">
-                <thead class="sticky top-[192px] z-40 text-gray-700 shadow-sm">
+                <thead class="text-gray-700 shadow-sm">
                     <tr>
                         <th colspan="5" class="bg-brand-headerBg"></th>
                         <th colspan="2" class="bg-brand-headerVenderBg text-center text-[11px] font-bold py-1">VENDER</th>
@@ -343,8 +343,8 @@
     </main>
 
     <!-- FOOTER -->
-    <footer class="bg-brand-footer text-white mt-auto w-full flex justify-center">
-        <div class="flex justify-between items-center w-full max-w-[1792px] py-3 px-8 text-xs">
+    <footer class="bg-brand-footer text-white py-3 px-6 flex justify-between items-center text-xs mt-auto w-full">
+        <div class="flex justify-between items-center w-full max-w-[1792px] mx-auto">
             <span class="text-blue-200">Versión: 3.18.3</span>
             <span class="text-blue-200">Una creación de <strong class="text-white">Gallo Financial Technology</strong></span>
         </div>
