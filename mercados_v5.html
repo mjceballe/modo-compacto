@@ -2180,16 +2180,18 @@
                 }
             };
 
+            const checkAndSnapToFirstRow = () => {
+                if (document.body.classList.contains('filters-scrolled')) {
+                    snapToFirstRow();
+                }
+            };
+
             document.querySelectorAll('.sticky-thead th[data-sort]').forEach(th => {
                 th.addEventListener('click', (e) => {
                     const key = th.getAttribute('data-sort');
                     const icon = th.querySelector('.ph-arrows-down-up');
                     sortData(key, icon);
-                    
-                    const isFiltersScrolled = document.body.classList.contains('filters-scrolled');
-                    if (isFiltersScrolled) {
-                        snapToFirstRow();
-                    }
+                    checkAndSnapToFirstRow();
                 });
             });
 
@@ -2348,6 +2350,7 @@
                     
                     renderChips();
                     applyFilters();
+                    checkAndSnapToFirstRow();
                     return;
                 }
             });
@@ -2357,6 +2360,7 @@
                 const mainChk = document.getElementById('chk-operados');
                 if (mainChk) mainChk.checked = e.target.checked;
                 applyFilters();
+                checkAndSnapToFirstRow();
             });
 
             document.getElementById('chk-operados').addEventListener('change', (e) => {
@@ -2365,6 +2369,7 @@
                 if (reducedChk) reducedChk.checked = e.target.checked;
                 renderChips();
                 applyFilters();
+                checkAndSnapToFirstRow();
             });
 
             document.querySelectorAll('.filter-dropdown-item').forEach(item => {
@@ -2382,6 +2387,7 @@
                     updateDropdownUI(type, value, defaultText);
                     renderChips();
                     applyFilters();
+                    checkAndSnapToFirstRow();
                     item.closest('[id^="dropdown-menu-"]').classList.add('hidden'); 
                 });
             });
@@ -2398,6 +2404,7 @@
                     activeFilters.categoria = target.textContent.trim();
                     renderChips();
                     applyFilters();
+                    checkAndSnapToFirstRow();
                 });
             });
 
@@ -2416,6 +2423,7 @@
                 }
                 
                 applyFilters();
+                // No llamamos a checkAndSnapToFirstRow() aquí para evitar que salte bruscamente mientras el usuario tipea.
             });
 
             // Evento para limpiar el buscador
@@ -2425,6 +2433,7 @@
                 clearSearchBtn.classList.add('hidden');
                 searchInput.focus(); 
                 applyFilters();
+                checkAndSnapToFirstRow();
             });
 
             renderChips(); 
