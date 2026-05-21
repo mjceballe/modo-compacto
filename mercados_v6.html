@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallo - Mercados V6</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            blue: '#1e3a8a',
+                            active: '#3557D4',
+                            bg: '#F2F4FC', /* Fondo general */
+                            card: '#ffffff',
+                            footer: '#2e386e',
+                            venderBg: '#f4f5f8',
+                            comprarBg: '#eaecef',
+                            headerBg: '#f1f4f9',
+                            headerVenderBg: '#e2e8f0',
+                            headerComprarBg: '#cbd5e1',
+                        },
+                        text: {
+                            main: '#1f2937',
+                            muted: '#6b7280',
+                            light: '#9ca3af'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --title-height: 92px;
+            --row-height: 32px;
+            --thead-top: 32px;
+            --thead-bottom: 32px;
+        }
+
+        html, body {
+            overflow-anchor: none;
+            background-color: #F2F4FC;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            min-width: 1200px;
+        }
+
+        /* --- ARQUITECTURA NATIVA 0 JUMPS --- */
+        #top-nav {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background-color: white;
+            transition: box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        body.scrolled #top-nav {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+        }
+
+        .header-row-2 { position: relative; z-index: 41; }
+        .header-row-3 { position: relative; z-index: 40; }
+
+        .hide-on-scroll { transition: opacity 0.2s ease; }
+        body.scrolled .hide-on-scroll { display: none !important; }
+        .scrolled-show { display: none !important; }
+        body.scrolled .scrolled-show { display: flex !important; }
+
+        /* Animación del Logo y Menú (Fade y Push/Pull sin recortes ni escalas) */
+        .logo-wrapper { 
+            width: 146px; 
+            opacity: 1;
+            transition: width 0.3s ease, opacity 0.2s ease; 
+        }
+        .logo-wrapper svg {
+            min-width: 146px; /* Mantiene su tamaño real mientras la opacidad baja */
+            flex-shrink: 0;
+        }
+        body.scrolled .logo-wrapper { 
+            width: 0px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Animación del Menú Hamburguesa */
+        .hamburger-wrapper {
+            width: 0px;
+            opacity: 0;
+            margin-right: 0;
+            pointer-events: none;
+            transition: width 0.3s ease, opacity 0.2s ease, margin-right 0.3s ease;
+        }
+        body.scrolled .hamburger-wrapper {
+            width: 32px;
+            opacity: 1;
+            margin-right: 1rem;
+            pointer-events: auto;
+        }
+
+        .title-card {
+            position: relative;
+            z-index: 35;
+            height: var(--title-height);
+            min-height: var(--title-height);
+            max-height: var(--title-height);
+            box-sizing: border-box;
+            background-color: white;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 16px;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            flex-shrink: 0;
+        }
+
+        .reduced-filter-bar {
+            position: fixed;
+            top: 64px; 
+            left: 0;
+            z-index: 45; 
+            width: 100%;
+            height: 36px; 
+            background-color: #f8fafc;
+            border-bottom: 1px solid transparent;
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.3s ease, opacity 0.2s ease, border-color 0.3s ease;
+        }
+        body.filters-scrolled .reduced-filter-bar {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+            border-bottom-color: #e5e7eb;
+        }
+
+        .table-wrapper {
+            transition: padding-left 0.3s ease, padding-right 0.3s ease;
+            padding-top: 0;
+        }
+        body.filters-scrolled .table-wrapper {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+
+        /* Thead Sticky Escalonado */
+        .sticky-thead {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 64px; 
+            z-index: 30;
+            transition: top 0.3s ease;
+        }
+        body.filters-scrolled .sticky-thead {
+            top: 100px; 
+        }
+
+        /* Estructura de Tabla */
+        .data-table tbody tr { height: var(--row-height); min-height: var(--row-height); max-height: var(--row-height); }
+        .data-table thead tr:nth-child(1) { height: var(--thead-top); min-height: var(--thead-top); max-height: var(--thead-top); }
+        .data-table thead tr:nth-child(2) { height: var(--thead-bottom); min-height: var(--thead-bottom); max-height: var(--thead-bottom); }
+
+        .data-table td, .data-table th { padding-top: 0; padding-bottom: 0; vertical-align: middle; white-space: nowrap; }
+        .data-table { border-collapse: separate; border-spacing: 0; }
+        .data-table thead tr:first-child th { border-top: 1px solid #e5e7eb; }
+        .data-table tbody tr { background-color: #ffffff; }
+        .data-table tbody td, .data-table thead tr:nth-child(2) th { border-bottom: 1px solid #e5e7eb; }
+        .data-table tbody tr:hover td:not(.bg-brand-venderBg):not(.bg-brand-comprarBg) { background-color: #f9fafb; }
+        
+        .variation-pill { display: inline-flex; align-items: center; justify-content: center; height: 16px; padding: 0 6px; border-radius: 9999px; font-weight: 500; }
+        .variation-pos { background-color: #def7ec; color: #046c4e; }
+        .variation-neg { background-color: #fde8e8; color: #9b1c1c; }
+
+        .main-content-wrapper {
+            flex-grow: 1;
+            padding: 2rem 16px;
+            width: 100%;
+            min-width: 1200px;
+            max-width: 1792px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- TOOLTIP HINT --- */
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+            cursor: default;
+        }
+        .tooltip-text {
+            visibility: hidden;
+            background-color: #1f2937;
+            color: #fff;
+            text-align: center;
+            padding: 4px 8px;
+            border-radius: 4px;
+            position: absolute;
+            z-index: 60;
+            bottom: 140%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0s, visibility 0s;
+            transition-delay: 0s;
+            white-space: nowrap;
+            font-size: 11px;
+            font-weight: normal;
+            pointer-events: none;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -4px;
+            border-width: 4px;
+            border-style: solid;
+            border-color: #1f2937 transparent transparent transparent;
+        }
+        .tooltip-container:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+            transition: opacity 0.2s, visibility 0.2s;
+            transition-delay: 2s;
+        }
+
+        /* --- FULLSCREEN --- */
+        body.is-fullscreen, body.is-fullscreen-simulated { height: 100vh; overflow: hidden; }
+        body.is-fullscreen #top-nav, body.is-fullscreen-simulated #top-nav,
+        body.is-fullscreen .header-row-2, body.is-fullscreen-simulated .header-row-2,
+        body.is-fullscreen .header-row-3, body.is-fullscreen-simulated .header-row-3,
+        body.is-fullscreen .title-card, body.is-fullscreen-simulated .title-card,
+        body.is-fullscreen footer, body.is-fullscreen-simulated footer { display: none !important; }
+        
+        body.is-fullscreen .main-content-wrapper, body.is-fullscreen-simulated .main-content-wrapper { 
+            padding: 2rem 16px !important; width: 100% !important; min-width: 1200px !important; max-width: 1792px !important; height: 100vh; 
+        }
+        body.is-fullscreen .reduced-filter-bar, body.is-fullscreen-simulated .reduced-filter-bar { top: 0 !important; }
+        body.is-fullscreen .sticky-thead, body.is-fullscreen-simulated .sticky-thead { top: 0 !important; }
+        body.is-fullscreen.filters-scrolled .sticky-thead, body.is-fullscreen-simulated.filters-scrolled .sticky-thead { top: 36px !important; }
+    </style>
+</head>
+<body class="text-text-main text-sm">
+
+    <!-- Fila 1: Top Nav -->
+    <header id="top-nav" class="w-full flex justify-center border-b border-gray-200">
+        <div class="flex items-center justify-between px-8 h-16 w-full max-w-[1792px]">
+            <div class="flex items-center h-8">
+                <!-- Menú Hamburguesa -->
+                <div class="relative hamburger-wrapper" id="hamburger-menu-container">
+                    <button id="btn-hamburger" class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-brand-active hover:bg-blue-50 rounded-md transition-colors shrink-0">
+                        <i class="ph ph-list text-[24px]"></i>
+                    </button>
+                    <!-- Menú Desplegable Hamburguesa -->
+                    <div id="hamburger-dropdown" class="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-xl hidden z-[100] overflow-hidden flex-col py-1">
+                        <a href="#" class="block px-5 py-3.5 text-[15px] text-brand-active bg-[#f4f5f8] font-medium border-b border-gray-100 transition-colors">Inicio</a>
+                        <a href="#" class="block px-5 py-3.5 text-[15px] text-gray-600 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">Mercados</a>
+                        <a href="#" class="block px-5 py-3.5 text-[15px] text-gray-600 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">Portafolio</a>
+                        <a href="#" class="block px-5 py-3.5 text-[15px] text-gray-600 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">Resultados</a>
+                        <a href="#" class="block px-5 py-3.5 text-[15px] text-gray-600 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">Actividad</a>
+                        <a href="#" class="block px-5 py-3.5 text-[15px] text-gray-600 hover:bg-gray-50 hover:text-brand-active transition-colors">Cuenta</a>
+                    </div>
+                </div>
+
+                <!-- Logo SVG -->
+                <div class="flex items-center h-full logo-wrapper">
+                    <svg width="146" height="40" viewBox="0 0 146 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M30.1484 9.50942H6.05986C5.96528 9.50942 5.87296 9.54503 5.8054 9.60787L0.105839 14.9098C0.0382823 14.9726 0 15.0585 0 15.1465V20.3688C0 20.4568 0.0382823 20.5427 0.105839 20.6055L5.80765 25.9095C5.87521 25.9724 5.96754 26.008 6.06212 26.008H26.9778C27.1759 26.008 27.3381 25.8593 27.3381 25.6728V20.8443C27.3381 20.66 27.1759 20.5092 26.9778 20.5092H6.27154C6.07338 20.5092 5.91124 20.3604 5.91124 20.174V15.3434C5.91124 15.1591 6.07112 15.0082 6.27154 15.0082H29.9368C30.1349 15.0082 30.2971 15.1591 30.2971 15.3434V30.1641C30.2971 30.3484 30.1349 30.4992 29.9368 30.4992H10.8632C10.7686 30.4992 10.6763 30.5348 10.6087 30.5977L5.41807 35.4283C5.19063 35.6398 5.35277 36.0001 5.67254 36.0001H30.1507C30.2453 36.0001 30.3376 35.9645 30.4052 35.9017L36.1047 30.5977C36.1723 30.5348 36.2106 30.449 36.2106 30.361V15.1465C36.2106 15.0585 36.1723 14.9726 36.1047 14.9098L30.4052 9.60578C30.3376 9.54294 30.2453 9.50732 30.1507 9.50732" fill="#3557D4"/>
+                        <path d="M77.0009 20.1719V15.1465C77.0009 15.0585 76.9626 14.9726 76.8951 14.9098L71.1932 9.60578C71.1257 9.54294 71.0334 9.50732 70.9388 9.50732H46.8502C46.7556 9.50732 46.6633 9.54294 46.5957 9.60578L40.8939 14.9098C40.8264 14.9726 40.7881 15.0585 40.7881 15.1465V20.3688C40.7881 20.4568 40.8264 20.5427 40.8939 20.6055L46.5957 25.9095C46.6633 25.9724 46.7556 26.008 46.8502 26.008H79.9441C80.1423 26.008 80.3044 25.8572 80.3044 25.6728V20.8443C80.3044 20.66 80.1423 20.5092 79.9441 20.5092H77.359C77.1608 20.5092 76.9986 20.3583 76.9986 20.174M70.7271 20.5092H47.0619C46.8637 20.5092 46.7016 20.3583 46.7016 20.174V15.3455C46.7016 15.1612 46.8637 15.0103 47.0619 15.0103H70.7271C70.9253 15.0103 71.0874 15.1612 71.0874 15.3455V20.174C71.0874 20.3583 70.9253 20.5092 70.7271 20.5092Z" fill="#3557D4"/>
+                        <path d="M145.449 14.9098L139.747 9.60578C139.68 9.54294 139.587 9.50732 139.493 9.50732H118.573C118.375 9.50732 118.212 9.65815 118.212 9.84249V14.671C118.212 14.8553 118.375 15.0062 118.573 15.0062H139.283C139.482 15.0062 139.644 15.157 139.644 15.3413V20.1719C139.644 20.3562 139.482 20.5071 139.283 20.5071H115.618C115.42 20.5071 115.258 20.3562 115.258 20.1719V10.318C115.258 10.0205 114.871 9.86972 114.643 10.0813L109.453 14.9098C109.385 14.9726 109.347 15.0585 109.347 15.1465V20.3688C109.347 20.4568 109.385 20.5427 109.453 20.6055L115.154 25.9095C115.222 25.9724 115.314 26.008 115.409 26.008H139.497C139.592 26.008 139.684 25.9724 139.752 25.9095L145.454 20.6055C145.521 20.5427 145.559 20.4568 145.559 20.3688V15.1465C145.559 15.0585 145.521 14.9726 145.454 14.9098" fill="#3557D4"/>
+                        <path d="M85.3415 4H82.7451C82.5469 4 82.3848 4.15082 82.3848 4.33517V9.13643C82.3848 9.32077 82.5469 9.47159 82.7451 9.47159H84.9812C85.1794 9.47159 85.3415 9.62242 85.3415 9.80676V25.6727C85.3415 25.8571 85.5036 26.0079 85.7018 26.0079H90.8924C91.0906 26.0079 91.2528 25.8571 91.2528 25.6727V4.33517C91.2528 4.15082 91.0929 4 90.8924 4H85.3415Z" fill="#3557D4"/>
+                        <path d="M98.8044 4H96.208C96.0098 4 95.8477 4.15082 95.8477 4.33517V9.13643C95.8477 9.32077 96.0098 9.47159 96.208 9.47159H98.4441C98.6423 9.47159 98.8044 9.62242 98.8044 9.80676V25.6727C98.8044 25.8571 98.9665 26.0079 99.1647 26.0079H104.355C104.554 26.0079 104.716 25.8571 104.716 25.6727V4.33517C104.716 4.15082 104.556 4 104.355 4H98.8044Z" fill="#3557D4"/>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="w-[600px] shrink-0 mx-8 relative flex items-center h-8">
+                <i class="ph ph-magnifying-glass absolute left-4 text-gray-500 text-lg font-bold"></i>
+                <input type="text" placeholder="Buscá un instrumento" class="w-full h-full pl-11 pr-4 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:border-brand-active focus:ring-1 focus:ring-brand-active">
+            </div>
+
+            <div class="flex items-center gap-2 h-8">
+                <button class="text-gray-600 hover:text-gray-900 transition-colors flex items-center justify-center h-full w-8"><i class="ph ph-question text-2xl"></i></button>
+                <button class="text-gray-600 hover:text-gray-900 transition-colors relative flex items-center justify-center h-full w-8">
+                    <i class="ph ph-bell text-2xl"></i><span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+                </button>
+                <button class="text-gray-600 hover:text-gray-900 transition-colors flex items-center justify-center h-full w-8"><i class="ph ph-wallet text-2xl"></i></button>
+                <button class="text-gray-600 hover:text-gray-900 transition-colors flex items-center justify-center h-full w-8"><i class="ph ph-user-circle text-2xl"></i></button>
+                <div class="flex items-center bg-brand-active text-white rounded-lg shadow-sm h-full overflow-hidden">
+                    <button class="px-4 h-full font-medium hover:bg-blue-700 transition-colors text-[14px] flex items-center">Operar</button>
+                    <div class="w-px h-5 bg-white/40"></div>
+                    <button class="px-2.5 h-full hover:bg-blue-700 transition-colors flex items-center"><i class="ph ph-caret-down text-lg"></i></button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Fila 2: Main Nav -->
+    <div class="header-row-2 w-full border-b border-gray-200 shrink-0 flex justify-center bg-white h-16">
+        <div class="flex justify-between px-8 h-full w-full max-w-[1792px]">
+            <nav class="flex items-end h-full gap-1">
+                <a href="#" class="relative h-12 flex flex-col justify-start group"><span class="h-9 px-4 flex items-center justify-center text-gray-600 hover:text-brand-active text-[14px] font-medium transition-colors">Inicio</span></a>
+                <a href="#" class="relative h-12 flex flex-col justify-start">
+                    <span class="h-9 px-5 flex items-center justify-center text-brand-active text-[14px] font-bold bg-[#f4f5f8] rounded-[10px]">Mercados</span>
+                    <span class="absolute -bottom-[1px] left-0 w-full h-[3px] bg-brand-active rounded-t-sm z-10"></span>
+                </a>
+                <a href="#" class="relative h-12 flex flex-col justify-start group"><span class="h-9 px-4 flex items-center justify-center text-gray-600 hover:text-brand-active text-[14px] font-medium transition-colors gap-1">Portafolio <i class="ph ph-caret-down text-sm"></i></span></a>
+                <a href="#" class="relative h-12 flex flex-col justify-start group"><span class="h-9 px-4 flex items-center justify-center text-gray-600 hover:text-brand-active text-[14px] font-medium transition-colors">Resultados</span></a>
+                <a href="#" class="relative h-12 flex flex-col justify-start group"><span class="h-9 px-4 flex items-center justify-center text-gray-600 hover:text-brand-active text-[14px] font-medium transition-colors">Actividad</span></a>
+                <a href="#" class="relative h-12 flex flex-col justify-start group"><span class="h-9 px-4 flex items-center justify-center text-gray-600 hover:text-brand-active text-[14px] font-medium transition-colors gap-1">Cuenta <i class="ph ph-caret-down text-sm"></i></span></a>
+                
+                <div class="relative h-12 flex flex-col justify-start group">
+                    <button class="h-9 px-4 flex items-center justify-center text-gray-600 hover:text-brand-active text-[14px] font-medium transition-colors gap-1 outline-none">
+                        Versión 6 <i class="ph ph-caret-down text-sm"></i>
+                    </button>
+                    <div class="absolute top-full left-0 pt-1 w-56 hidden group-hover:block z-[100]">
+                        <div class="bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden flex flex-col">
+                            <a href="index.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">Versión 0 (Cambios mín)</a>
+                            <a href="mercados_v1.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">Versión 1 (Scroll)</a>
+                            <a href="mercados_v2.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">Versión 2 (Sticky)</a>
+                            <a href="mercados_v3.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">Versión 3 (Expandir card)</a>
+                            <a href="mercados_v4.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">Versión 4 (Unificada)</a>
+                            <a href="mercados_v5.html" class="block px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 hover:text-brand-active border-b border-gray-100 transition-colors">Versión 5 (chips)</a>
+                            <a href="mercados_v6.html" class="block px-4 py-2.5 text-[13px] text-brand-active bg-gray-50 font-medium hover:bg-gray-100 transition-colors">Versión 6 (Sin logo)</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            <div class="flex items-center h-full hide-on-scroll">
+                <div class="border border-blue-600 bg-blue-50/50 rounded-full px-5 h-8 flex items-center text-[13px] text-gray-800 font-medium tracking-wide">
+                    CC 125780 | Pérez, Juan C...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fila 3: Balance Bar -->
+    <div class="header-row-3 w-full bg-[#f8fafc] border-b border-gray-100 shadow-[0_4px_6px_-6px_rgba(0,0,0,0.1)] flex justify-center h-16">
+        <div class="flex items-center justify-between px-8 h-full w-full max-w-[1792px]">
+            <div class="flex items-center h-8">
+                <span class="text-[14px] font-semibold text-gray-800 mr-5 flex items-center h-full">Disponible para operar</span>
+                <div class="flex items-center bg-white border border-gray-300 rounded-lg overflow-hidden text-xs font-medium p-[2px] h-full">
+                    <button class="px-3 h-full flex items-center text-gray-500 hover:bg-gray-50 rounded-md">C.I.</button>
+                    <button class="px-3 h-full flex items-center bg-blue-100/60 text-brand-active rounded-md">24h</button>
+                </div>
+                <div class="w-px h-5 bg-gray-300 mx-5"></div>
+                <div class="flex items-center text-[14px] h-full"><span class="text-gray-400 font-semibold text-xs mr-1.5 tracking-wider">ARS</span><span class="font-bold text-gray-900 text-[15px]">123.456</span><span class="text-gray-500 font-medium text-[13px]">,78</span></div>
+                <div class="w-px h-5 bg-gray-300 mx-5"></div>
+                <div class="flex items-center text-[14px] h-full"><span class="text-gray-400 font-semibold text-xs mr-1.5 tracking-wider">USD</span><span class="font-bold text-gray-900 text-[15px]">900</span><span class="text-gray-500 font-medium text-[13px]">,00</span></div>
+                <div class="w-px h-5 bg-gray-300 mx-5"></div>
+                <div class="flex items-center text-[14px] opacity-70 h-full"><span class="text-gray-400 font-semibold text-xs mr-1.5 tracking-wider">USD EXT</span><span class="font-bold text-gray-700 text-[15px]">0</span><span class="text-gray-400 font-medium text-[13px]">,00</span></div>
+                <div class="w-px h-5 bg-gray-300 mx-5"></div>
+                <a href="#" class="text-[13px] text-gray-500 hover:text-gray-800 underline underline-offset-2 decoration-gray-400 flex items-center font-medium h-full">Ver detalle <i class="ph ph-arrow-right ml-1"></i></a>
+            </div>
+            <a href="#" class="text-brand-active text-[14px] font-medium hover:text-blue-800 transition-colors h-8 flex items-center">Ingresar/retirar fondos</a>
+        </div>
+    </div>
+
+    <!-- BARRA REDUCIDA DE FILTROS -->
+    <div class="reduced-filter-bar flex justify-center">
+        <div class="flex items-center justify-between px-8 w-full max-w-[1792px] h-full">
+            <div class="flex items-center text-[#676C7E]">
+                <span class="mr-3 text-[12px]">Filtros aplicados:</span>
+                <div id="applied-filters-chips" class="flex items-center gap-2">
+                    <!-- Chips inyectados por JS -->
+                </div>
+                <!-- Checkbox suelto sincronizado -->
+                <label class="flex items-center gap-1.5 cursor-pointer ml-3 h-[20px]">
+                    <input type="checkbox" id="chk-operados-reduced" class="rounded border-gray-300 text-brand-active focus:ring-brand-active w-3.5 h-3.5 m-0 cursor-pointer">
+                    <span class="text-[11px] text-[#676C7E] font-medium leading-none mt-[1px]">Mostrar solo operados</span>
+                </label>
+            </div>
+            <!-- Botón Fullscreen -->
+            <button class="btn-fullscreen text-brand-active hover:bg-[#E1E6F9] rounded-[4px] w-6 h-6 flex items-center justify-center transition-colors" title="Ver en pantalla completa (F11 u Opc+Cmd+F)">
+                <i class="ph ph-corners-out text-[16px]"></i>
+            </button>
+        </div>
+    </div>
+
+    <main class="main-content-wrapper z-30 relative">
+        
+        <!-- CARD TITLE -->
+        <div class="title-card">
+            <div class="flex items-center text-xs text-brand-active mb-1 gap-1">
+                <i class="ph ph-house"></i>
+                <a href="#" class="hover:underline">Inicio</a>
+                <i class="ph ph-caret-right text-gray-400 text-[10px]"></i>
+                <span class="text-gray-500">Mercados</span>
+            </div>
+            <h1 class="text-2xl font-bold text-gray-800">Mercados</h1>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col flex-grow">
+            <!-- Pestañas Principales -->
+            <div class="flex px-4 border-b border-gray-200 shrink-0">
+                <button class="px-4 py-3 text-brand-active font-medium border-b-2 border-brand-active text-sm">BYMA</button>
+                <button class="px-4 py-3 text-gray-500 hover:text-gray-800 font-medium text-sm">A3</button>
+                <button class="px-4 py-3 text-gray-500 hover:text-gray-800 font-medium text-sm">Mercado USA</button>
+                <button class="px-4 py-3 text-gray-500 hover:text-gray-800 font-medium text-sm flex items-center gap-1"><i class="ph ph-star"></i> Favoritos</button>
+                <button class="px-4 py-3 text-gray-500 hover:text-gray-800 font-medium text-sm flex items-center gap-1"><i class="ph ph-thumbs-up"></i> Recomendados</button>
+            </div>
+            
+            <!-- Pestañas Secundarias (Categorías) -->
+            <div class="px-4 mt-4 flex gap-2 overflow-x-auto shrink-0">
+                <button class="filter-pill px-4 py-1.5 bg-blue-50 text-brand-active rounded-full text-xs font-medium border border-blue-200">Líderes</button>
+                <button class="filter-pill px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">General</button>
+                <button class="filter-pill px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">Opciones</button>
+                <button class="filter-pill px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">Cedears</button>
+                <button class="filter-pill px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">Bonos</button>
+                <button class="filter-pill px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">Letras</button>
+                <button class="filter-pill px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">ONs</button>
+                <button class="filter-pill px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">FCI</button>
+                <button class="filter-pill px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">Cauciones</button>
+                <button class="filter-pill px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">Índices</button>
+                <button class="filter-pill px-4 py-1.5 bg-white text-gray-600 rounded-full text-xs border border-gray-300 hover:bg-gray-50">Futuros</button>
+            </div>
+            
+            <!-- Barra de Filtros interactiva -->
+            <div id="main-filters-container" class="px-4 mt-4 flex items-center justify-between shrink-0 relative z-[45]">
+                <div class="flex items-center gap-3">
+                    <div class="relative w-64">
+                        <i class="ph ph-magnifying-glass absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" placeholder="Buscá especie o descripción" class="w-full pl-8 pr-3 py-1.5 bg-white border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-brand-active">
+                    </div>
+                    
+                    <!-- Dropdown Plazo -->
+                    <div class="relative" id="dropdown-container-plazo">
+                        <button id="btn-plazo" class="border border-brand-active text-brand-active bg-blue-50 px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 font-medium outline-none transition-colors hover:bg-blue-100">
+                            Plazo: 24h <i class="ph ph-caret-down"></i>
+                        </button>
+                        <div class="absolute top-full left-0 pt-1 w-32 hidden z-[60]" id="dropdown-menu-plazo">
+                            <div class="bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden flex flex-col">
+                                <a href="#" class="filter-dropdown-item px-4 py-2.5 text-[12px] text-gray-700 hover:bg-gray-50 hover:text-brand-active" data-type="plazo" data-value="C.I.">C.I.</a>
+                                <a href="#" class="filter-dropdown-item px-4 py-2.5 text-[12px] text-brand-active bg-blue-50 font-medium" data-type="plazo" data-value="24h">24h</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Dropdown Variación -->
+                    <div class="relative" id="dropdown-container-variacion">
+                        <button id="btn-variacion" class="border border-gray-300 text-gray-600 bg-white px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 hover:bg-gray-50 outline-none transition-colors">
+                            Variación <i class="ph ph-caret-down"></i>
+                        </button>
+                        <div class="absolute top-full left-0 pt-1 w-32 hidden z-[60]" id="dropdown-menu-variacion">
+                            <div class="bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden flex flex-col">
+                                <a href="#" class="filter-dropdown-item px-4 py-2.5 text-[12px] text-brand-active bg-blue-50 font-medium" data-type="variacion" data-value="Todas">Todas</a>
+                                <a href="#" class="filter-dropdown-item px-4 py-2.5 text-[12px] text-gray-700 hover:bg-gray-50 hover:text-brand-active" data-type="variacion" data-value="Alza">Alza</a>
+                                <a href="#" class="filter-dropdown-item px-4 py-2.5 text-[12px] text-gray-700 hover:bg-gray-50 hover:text-brand-active" data-type="variacion" data-value="Baja">Baja</a>
+                                <a href="#" class="filter-dropdown-item px-4 py-2.5 text-[12px] text-gray-700 hover:bg-gray-50 hover:text-brand-active" data-type="variacion" data-value="Estable">Estable</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dropdown Moneda -->
+                    <div class="relative" id="dropdown-container-moneda">
+                        <button id="btn-moneda" class="border border-gray-300 text-gray-600 bg-white px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 hover:bg-gray-50 outline-none transition-colors">
+                            Moneda <i class="ph ph-caret-down"></i>
+                        </button>
+                        <div class="absolute top-full left-0 pt-1 w-32 hidden z-[60]" id="dropdown-menu-moneda">
+                            <div class="bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden flex flex-col">
+                                <a href="#" class="filter-dropdown-item px-4 py-2.5 text-[12px] text-brand-active bg-blue-50 font-medium" data-type="moneda" data-value="Todas">Todas</a>
+                                <a href="#" class="filter-dropdown-item px-4 py-2.5 text-[12px] text-gray-700 hover:bg-gray-50 hover:text-brand-active" data-type="moneda" data-value="ARS">ARS</a>
+                                <a href="#" class="filter-dropdown-item px-4 py-2.5 text-[12px] text-gray-700 hover:bg-gray-50 hover:text-brand-active" data-type="moneda" data-value="USD">USD</a>
+                                <a href="#" class="filter-dropdown-item px-4 py-2.5 text-[12px] text-gray-700 hover:bg-gray-50 hover:text-brand-active" data-type="moneda" data-value="USD Ext.">USD Ext.</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <label class="flex items-center gap-2 cursor-pointer ml-2">
+                        <input type="checkbox" id="chk-operados" class="rounded border-gray-300 text-brand-active focus:ring-brand-active w-4 h-4">
+                        <span class="text-xs text-gray-600">Mostrar solo operados</span>
+                        <i class="ph ph-info text-gray-400"></i>
+                    </label>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <button class="text-gray-500 hover:text-gray-700"><i class="ph ph-download-simple text-lg"></i></button>
+                </div>
+            </div>
+            
+            <!-- Tabla Principal -->
+            <div class="table-wrapper px-4 mt-4 mb-4 flex-grow relative">
+                <table class="w-full data-table text-[11px] text-right">
+                    <thead class="sticky-thead text-gray-700 shadow-sm">
+                        <tr>
+                            <th colspan="5" class="bg-brand-headerBg"></th>
+                            <th colspan="2" class="bg-brand-headerVenderBg text-center text-[11px] font-bold py-1">VENDER</th>
+                            <th colspan="2" class="bg-brand-headerComprarBg text-center text-[11px] font-bold py-1">COMPRAR</th>
+                            <th colspan="6" class="bg-brand-headerBg"></th>
+                        </tr>
+                        <tr class="font-medium text-gray-600">
+                            <th class="w-8 px-2 text-center py-2 bg-brand-headerBg"></th>
+                            <th class="text-left px-2 py-2 bg-brand-headerBg cursor-pointer hover:bg-gray-50 transition-colors group" data-sort="esp">
+                                Especie <i class="ph ph-arrows-down-up text-[10px] ml-1 transition-transform inline-block opacity-40 group-hover:opacity-100"></i>
+                            </th>
+                            <th class="text-left px-2 py-2 bg-brand-headerBg">Plazo</th>
+                            <th class="px-2 py-2 bg-brand-headerBg cursor-pointer hover:bg-gray-50 transition-colors group" data-sort="ult">
+                                Último <i class="ph ph-arrows-down-up text-[10px] ml-1 transition-transform inline-block opacity-40 group-hover:opacity-100"></i>
+                            </th>
+                            <th class="px-2 py-2 bg-brand-headerBg cursor-pointer hover:bg-gray-50 transition-colors group" data-sort="var">
+                                Var. % <i class="ph ph-arrows-down-up text-[10px] ml-1 transition-transform inline-block opacity-40 group-hover:opacity-100"></i>
+                            </th>
+                            <th class="px-2 py-2 bg-brand-headerVenderBg">CC</th>
+                            <th class="px-2 py-2 bg-brand-headerVenderBg">PC</th>
+                            <th class="px-2 py-2 bg-brand-headerComprarBg">PV</th>
+                            <th class="px-2 py-2 bg-brand-headerComprarBg">CV</th>
+                            <th class="px-2 py-2 bg-brand-headerBg">Cierre</th>
+                            <th class="px-2 py-2 bg-brand-headerBg">Mín.</th>
+                            <th class="px-2 py-2 bg-brand-headerBg">Máx.</th>
+                            <th class="px-2 py-2 bg-brand-headerBg cursor-pointer hover:bg-gray-50 transition-colors group" data-sort="cant">
+                                Cant. op. <i class="ph ph-arrows-down-up text-[10px] ml-1 transition-transform inline-block opacity-40 group-hover:opacity-100"></i>
+                            </th>
+                            <th class="px-2 py-2 bg-brand-headerBg cursor-pointer hover:bg-gray-50 transition-colors group" data-sort="vol">
+                                Volumen <i class="ph ph-arrows-down-up text-[10px] ml-1 transition-transform inline-block opacity-40 group-hover:opacity-100"></i>
+                            </th>
+                            <th class="px-2 py-2 pr-4 bg-brand-headerBg">Hora</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body" class="text-gray-700 bg-white">
+                        <!-- Las filas se renderizan vía JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-brand-footer text-white mt-auto w-full flex justify-center z-30 relative">
+        <div class="flex justify-between items-center w-full max-w-[1792px] py-3 px-8 text-xs">
+            <span class="text-blue-200">Versión: 3.18.3</span>
+            <span class="text-blue-200">Una creación de <strong class="text-white">Gallo Financial Technology</strong></span>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // ==========================================
+            // LOGICA DE ORDENAMIENTO (DATOS REALES)
+            // ==========================================
+            const rawData = [
+                { esp: 'ALUA', nombre: 'ALUAR ALUMINIO', plazo: '24h', ult: '890,00', var: 1.15, cc: '1.200', pc: '889,50', pv: '891,00', cv: '5.000', cierre: '880,00', min: '875,00', max: '895,00', cant: '125.000', vol: '111.250.000', hora: '14:03:15', fav: false },
+                { esp: 'ALUAD', nombre: 'ALUAR ALUMINIO', plazo: '24h', ult: '0,95', var: 0.50, cc: '5.000', pc: '0,94', pv: '0,96', cv: '2.500', cierre: '0,94', min: '0,94', max: '0,96', cant: '10.500', vol: '9.975,00', hora: '14:02:10', fav: false },
+                { esp: 'BBAR', nombre: 'BANCO BBVA ARG ESC S 1 V.', plazo: '24h', ult: '7.235,00', var: -1.76, cc: '175', pc: '7.215,00', pv: '7.235,00', cv: '8', cierre: '7.365,00', min: '7.155,00', max: '7.475,00', cant: '73.566', vol: '535.552.690', hora: '14:03:27', fav: false },
+                { esp: 'BMA', nombre: 'BANCO MACRO', plazo: '24h', ult: '10.790,00', var: -0.46, cc: '2.865', pc: '10.770,00', pv: '10.790,00', cv: '20', cierre: '10.840,00', min: '10.550,00', max: '11.030,00', cant: '54.784', vol: '594.499.370', hora: '14:03:31', fav: true },
+                { esp: 'CEPU', nombre: 'CENTRAL PUERTO', plazo: '24h', ult: '2.124,00', var: -0.28, cc: '570', pc: '2.124,00', pv: '2.125,00', cv: '234', cierre: '2.130,00', min: '2.067,00', max: '2.165,00', cant: '269.751', vol: '569.058.171', hora: '14:03:31', fav: false },
+                { esp: 'COMEC', nombre: 'COM. DEL PLATA', plazo: '24h', ult: '0,03', var: 6.89, cc: '20.012', pc: '0,029', pv: '0,030', cv: '495', cierre: '0,029', min: '0,031', max: '0,031', cant: '120', vol: '3,72', hora: '14:03:23', fav: false },
+                { esp: 'COMED', nombre: 'COM. DEL PLATA', plazo: '24h', ult: '0,03', var: 0.00, cc: '10.006', pc: '0,031', pv: '0,032', cv: '441.027', cierre: '0,031', min: '0,030', max: '0,032', cant: '14.992', vol: '475,36', hora: '14:03:23', fav: false },
+                { esp: 'CRES', nombre: 'CRESUD', plazo: '24h', ult: '980,50', var: 0.50, cc: '5.600', pc: '979,00', pv: '981,00', cv: '3.400', cierre: '975,50', min: '970,00', max: '990,00', cant: '320.000', vol: '313.760.000', hora: '14:02:50', fav: false },
+                { esp: 'EDN', nombre: 'EDENOR', plazo: '24h', ult: '895,00', var: 3.20, cc: '4.500', pc: '894,00', pv: '896,00', cv: '1.500', cierre: '867,00', min: '860,00', max: '905,00', cant: '250.000', vol: '223.750.000', hora: '14:03:55', fav: false },
+                { esp: 'GGAL', nombre: 'GRUPO FINANCIERO GALICIA', plazo: '24h', ult: '41.200,50', var: 4.55, cc: '12.345', pc: '41.200,50', pv: '41.150,00', cv: '67.890', cierre: '39.400,00', min: '39.000,00', max: '41.500,00', cant: '22.000.000', vol: '900.000.000', hora: '14:04:10', fav: false },
+                { esp: 'GGALD', nombre: 'GRUPO FINANCIERO GALICIA', plazo: '24h', ult: '35,50', var: 1.25, cc: '5.200', pc: '35,40', pv: '35,60', cv: '1.800', cierre: '35,10', min: '35,00', max: '36,00', cant: '45.000', vol: '1.597.500', hora: '14:01:20', fav: false },
+                { esp: 'LOMA', nombre: 'LOMA NEGRA', plazo: '24h', ult: '1.450,00', var: 1.05, cc: '1.800', pc: '1.445,00', pv: '1.455,00', cv: '2.200', cierre: '1.435,00', min: '1.430,00', max: '1.460,00', cant: '110.000', vol: '159.500.000', hora: '14:03:10', fav: false },
+                { esp: 'LOMAD', nombre: 'LOMA NEGRA', plazo: '24h', ult: '1,35', var: 0.00, cc: '4.500', pc: '1,34', pv: '1,36', cv: '1.200', cierre: '1,35', min: '1,34', max: '1,36', cant: '15.000', vol: '20.250,00', hora: '13:50:11', fav: false },
+                { esp: 'PAMP', nombre: 'PAMPA ENERGÍA', plazo: '24h', ult: '2.560,00', var: -0.80, cc: '2.100', pc: '2.555,00', pv: '2.565,00', cv: '800', cierre: '2.580,00', min: '2.540,00', max: '2.600,00', cant: '89.000', vol: '227.840.000', hora: '14:03:05', fav: false },
+                { esp: 'TGSU2', nombre: 'TRANS. DE GAS DEL SUR', plazo: '24h', ult: '8.760,00', var: -1.29, cc: '47', pc: '8.755,00', pv: '8.760,00', cv: '11', cierre: '8.875,00', min: '8.700,00', max: '8.990,00', cant: '15.200', vol: '133.400.000', hora: '14:03:10', fav: false },
+                { esp: 'TGSUC', nombre: 'TRANS. DE GAS DEL SUR', plazo: '24h', ult: '0,00', var: 0.00, cc: '47', pc: '5,90', pv: '6,05', cv: '200', cierre: '5,97', min: '0,00', max: '0,00', cant: '0', vol: '0,00', hora: '14:02:39', fav: false },
+                { esp: 'TGSUD', nombre: 'TRANS. DE GAS DEL SUR', plazo: '24h', ult: '6,16', var: -1.91, cc: '826', pc: '6,16', pv: '6,19', cv: '31', cierre: '6,28', min: '6,15', max: '6,34', cant: '1.802', vol: '11.190,04', hora: '14:02:39', fav: false },
+                { esp: 'TXAR', nombre: 'TERNIUM ARGENTINA S.A.', plazo: '24h', ult: '636,50', var: 0.00, cc: '990', pc: '636,50', pv: '638,00', cv: '1.198', cierre: '636,50', min: '625,00', max: '644,00', cant: '578.925', vol: '367.502.601,5', hora: "14:03:29", fav: false },
+                { esp: 'YPFD', nombre: 'YPF S.A.', plazo: '24h', ult: '18.900,00', var: 2.50, cc: '350', pc: '18.850,00', pv: '18.950,00', cv: '1.200', cierre: '18.440,00', min: '18.400,00', max: '19.100,00', cant: '45.000', vol: '850.500.000', hora: '14:03:40', fav: true },
+                { esp: 'YPFDD', nombre: 'YPF S.A.', plazo: '24h', ult: '19,50', var: 0.50, cc: '4.200', pc: '19,45', pv: '19,55', cv: '3.100', cierre: '19,40', min: '19,30', max: '19,80', cant: '25.000', vol: '487.500,00', hora: '14:00:15', fav: false }
+            ];
+            
+            let tableData = [...rawData]; 
+
+            let currentSortColumn = 'esp';
+            let currentSortDirection = 'asc';
+
+            const parseValue = (val) => {
+                if (typeof val === 'number') return val;
+                if (typeof val === 'string') {
+                    const stripped = val.replace(/\./g, '').replace(',', '.');
+                    if (!isNaN(stripped) && stripped.trim() !== '') {
+                        return parseFloat(stripped);
+                    }
+                    return val.toLowerCase();
+                }
+                return val;
+            };
+
+            const renderTable = () => {
+                const tbody = document.getElementById('table-body');
+                let html = '';
+                tableData.forEach((row, i) => {
+                    const isPos = row.var > 0;
+                    const isNeg = row.var < 0;
+                    const varClass = isPos ? 'variation-pos' : (isNeg ? 'variation-neg' : 'bg-gray-100 text-gray-600');
+                    const varIcon = isPos ? 'ph-arrow-up' : (isNeg ? 'ph-arrow-down' : 'ph-minus');
+                    const showPlazoArrow = (i % 2 === 0);
+                    const arrowIndic = showPlazoArrow ? (isPos ? '<i class="ph ph-arrow-up text-green-500 font-bold ml-1"></i>' : (isNeg ? '<i class="ph ph-arrow-down text-red-500 font-bold ml-1"></i>' : '')) : '';
+                    const starClass = row.fav ? 'ph-star text-brand-active fill-current' : 'ph-star text-gray-300';
+                    const starWeight = row.fav ? 'weight="fill"' : '';
+                    const varText = row.var === 0 ? '0.00%' : Math.abs(row.var).toFixed(2) + '%';
+                    
+                    html += `
+                        <tr class="bg-white border-b border-gray-100 last:border-b-0">
+                            <td class="px-2 text-center"><i class="ph ${starClass} text-sm cursor-pointer" ${starWeight}></i></td>
+                            <td class="px-2 text-left font-bold text-gray-800">
+                                <div class="tooltip-container">${row.esp}
+                                    <span class="tooltip-text">${row.nombre}</span>
+                                </div>
+                            </td>
+                            <td class="px-2 text-left font-bold">${row.plazo} ${arrowIndic}</td>
+                            <td class="px-2">${row.ult}</td>
+                            <td class="px-2"><span class="variation-pill ${varClass}"><i class="ph ${varIcon} mr-0.5"></i> ${varText}</span></td>
+                            <td class="px-2 bg-brand-venderBg">${row.cc}</td>
+                            <td class="px-2 bg-brand-venderBg">${row.pc}</td>
+                            <td class="px-2 bg-brand-comprarBg">${row.pv}</td>
+                            <td class="px-2 bg-brand-comprarBg">${row.cv}</td>
+                            <td class="px-2 text-gray-500">${row.cierre}</td>
+                            <td class="px-2 text-gray-500">${row.min}</td>
+                            <td class="px-2 text-gray-500">${row.max}</td>
+                            <td class="px-2 text-gray-500">${row.cant}</td>
+                            <td class="px-2 text-gray-500">${row.vol}</td>
+                            <td class="px-2 pr-4 text-gray-800">${row.hora}</td>
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = html;
+            };
+
+            const sortData = (key, iconElement) => {
+                if (currentSortColumn === key) {
+                    currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+                } else {
+                    currentSortColumn = key;
+                    currentSortDirection = 'asc';
+                }
+
+                document.querySelectorAll('.sticky-thead .ph-arrows-down-up').forEach(icon => {
+                    icon.style.transform = 'rotate(0deg)';
+                    icon.classList.remove('text-brand-active');
+                    icon.classList.add('opacity-40');
+                });
+
+                if (iconElement) {
+                    iconElement.style.transform = currentSortDirection === 'asc' ? 'rotate(0deg)' : 'rotate(180deg)';
+                    iconElement.classList.add('text-brand-active');
+                    iconElement.classList.remove('opacity-40');
+                }
+
+                tableData.sort((a, b) => {
+                    let valA = parseValue(a[key]);
+                    let valB = parseValue(b[key]);
+
+                    if (valA < valB) return currentSortDirection === 'asc' ? -1 : 1;
+                    if (valA > valB) return currentSortDirection === 'asc' ? 1 : -1;
+                    return 0;
+                });
+
+                renderTable();
+            };
+
+            // Orden Inicial Alfabético (A-Z) sobre Especie
+            tableData.sort((a, b) => a.esp.localeCompare(b.esp));
+            const initialIcon = document.querySelector('th[data-sort="esp"] .ph-arrows-down-up');
+            if (initialIcon) {
+                initialIcon.style.transform = 'rotate(0deg)';
+                initialIcon.classList.add('text-brand-active');
+                initialIcon.classList.remove('opacity-40');
+            }
+            renderTable();
+
+            // --- AUTO SCROLL PERFECTO ---
+            const snapToFirstRow = () => {
+                const tbody = document.querySelector('#table-body');
+                if (tbody) {
+                    const offsetPosition = tbody.getBoundingClientRect().top + window.scrollY - 154; // 64 (TopNav) + 64 (Thead) + 26 (Barra Reducida) = 154
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            };
+
+            document.querySelectorAll('.sticky-thead th[data-sort]').forEach(th => {
+                th.addEventListener('click', (e) => {
+                    const key = th.getAttribute('data-sort');
+                    const icon = th.querySelector('.ph-arrows-down-up');
+                    sortData(key, icon);
+                    
+                    const isFiltersScrolled = document.body.classList.contains('filters-scrolled');
+                    if (isFiltersScrolled) {
+                        snapToFirstRow();
+                    }
+                });
+            });
+
+            // ==========================================
+            // LÓGICA DE INTERFAZ GENERAL
+            // ==========================================
+            
+            let isScrolled = false;
+            let areFiltersScrolled = false;
+
+            const btnHamburger = document.getElementById('btn-hamburger');
+            const hamburgerDropdown = document.getElementById('hamburger-dropdown');
+            
+            btnHamburger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                hamburgerDropdown.classList.toggle('hidden');
+                hamburgerDropdown.classList.toggle('flex');
+            });
+
+            const activeFilters = { categoria: 'Líderes', plazo: '24h', variacion: null, moneda: null, soloOperados: false };
+            
+            const filterOptions = {
+                categoria: ['Líderes', 'General', 'Opciones', 'Cedears', 'Bonos', 'Letras', 'ONs', 'FCI', 'Cauciones', 'Índices', 'Futuros'],
+                plazo: ['C.I.', '24h'],
+                variacion: ['Todas', 'Alza', 'Baja', 'Estable'],
+                moneda: ['Todas', 'ARS', 'USD', 'USD Ext.']
+            };
+
+            const setupMainFilterDropdowns = () => {
+                const filters = ['plazo', 'variacion', 'moneda'];
+                filters.forEach(type => {
+                    const btn = document.getElementById(`btn-${type}`);
+                    const menu = document.getElementById(`dropdown-menu-${type}`);
+                    if (btn && menu) {
+                        btn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            filters.forEach(otherType => {
+                                if (otherType !== type) document.getElementById(`dropdown-menu-${otherType}`)?.classList.add('hidden');
+                            });
+                            document.querySelectorAll('.chip-dropdown-menu').forEach(m => m.classList.add('hidden')); 
+                            menu.classList.toggle('hidden');
+                        });
+                    }
+                });
+            };
+            setupMainFilterDropdowns();
+
+            document.addEventListener('click', (e) => {
+                if (!btnHamburger.contains(e.target) && !hamburgerDropdown.contains(e.target)) {
+                    hamburgerDropdown.classList.add('hidden');
+                    hamburgerDropdown.classList.remove('flex');
+                }
+                ['plazo', 'variacion', 'moneda'].forEach(type => {
+                    const container = document.getElementById(`dropdown-container-${type}`);
+                    const menu = document.getElementById(`dropdown-menu-${type}`);
+                    if (container && menu && !container.contains(e.target)) {
+                        menu.classList.add('hidden');
+                    }
+                });
+                document.querySelectorAll('.chip-dropdown-menu').forEach(m => {
+                    const container = m.parentElement;
+                    if (!container.contains(e.target)) m.classList.add('hidden');
+                });
+            });
+
+            const updateDropdownUI = (type, value, defaultText) => {
+                const btn = document.getElementById(`btn-${type}`);
+                if (!btn) return;
+                const items = btn.nextElementSibling.querySelectorAll('.filter-dropdown-item');
+                items.forEach(sib => {
+                    sib.classList.remove('text-brand-active', 'bg-blue-50', 'font-medium');
+                    sib.classList.add('text-gray-700');
+                    if (value && sib.dataset.value === value) {
+                        sib.classList.remove('text-gray-700');
+                        sib.classList.add('text-brand-active', 'bg-blue-50', 'font-medium');
+                    }
+                });
+
+                if (value && value !== 'Todas') {
+                    btn.innerHTML = `${type === 'plazo' ? 'Plazo: ' + value : value} <i class="ph ph-caret-down"></i>`;
+                    btn.classList.add('border-brand-active', 'text-brand-active', 'bg-blue-50');
+                    btn.classList.remove('border-gray-300', 'text-gray-600', 'bg-white', 'hover:bg-gray-50');
+                } else {
+                    btn.innerHTML = `${defaultText} <i class="ph ph-caret-down"></i>`;
+                    btn.classList.remove('border-brand-active', 'text-brand-active', 'bg-blue-50');
+                    btn.classList.add('border-gray-300', 'text-gray-600', 'bg-white', 'hover:bg-gray-50');
+                }
+            };
+
+            const renderChips = () => {
+                const container = document.getElementById('applied-filters-chips');
+                container.innerHTML = ''; 
+                
+                const createChip = (label, type) => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'relative group/chip-dropdown flex items-center';
+
+                    let dropdownItems = filterOptions[type].map(opt => {
+                        const isActive = activeFilters[type] === opt || (type === 'variacion' && (!activeFilters.variacion || activeFilters.variacion === 'Todas') && opt === 'Todas') || (type === 'moneda' && (!activeFilters.moneda || activeFilters.moneda === 'Todas') && opt === 'Todas');
+                        const activeClasses = isActive ? 'text-brand-active bg-blue-50 font-medium' : 'text-gray-700 hover:bg-gray-50 hover:text-brand-active';
+                        return `<a href="#" class="chip-dropdown-item block px-4 py-2 text-[12px] transition-colors border-b border-gray-100 last:border-0 ${activeClasses}" data-type="${type}" data-value="${opt}">${opt}</a>`;
+                    }).join('');
+
+                    wrapper.innerHTML = `
+                        <button class="flex items-center h-[18px] px-2 bg-white border border-[#D5D7DD] rounded-full text-[#676C7E] text-[11px] font-medium gap-1 cursor-pointer box-border hover:bg-gray-50 transition-colors outline-none btn-chip-dropdown" data-type="${type}">
+                            <span class="leading-none flex items-center mt-[1px]">${label}</span>
+                            <i class="ph ph-caret-down text-[12px] leading-none flex items-center justify-center"></i>
+                        </button>
+                        <div class="absolute top-full left-0 mt-1.5 min-w-[120px] hidden z-[100] chip-dropdown-menu shadow-xl rounded-lg border border-gray-200 bg-white overflow-hidden flex-col" id="chip-menu-${type}">
+                            ${dropdownItems}
+                        </div>
+                    `;
+                    return wrapper;
+                };
+
+                const varText = (activeFilters.variacion && activeFilters.variacion !== 'Todas') ? `Variación: ${activeFilters.variacion}` : 'Variación';
+                const monText = (activeFilters.moneda && activeFilters.moneda !== 'Todas') ? `Moneda: ${activeFilters.moneda}` : 'Moneda';
+
+                container.appendChild(createChip(activeFilters.categoria || 'Líderes', 'categoria'));
+                container.appendChild(createChip(`Plazo: ${activeFilters.plazo || '24h'}`, 'plazo'));
+                container.appendChild(createChip(varText, 'variacion'));
+                container.appendChild(createChip(monText, 'moneda'));
+                
+                const chkReduced = document.getElementById('chk-operados-reduced');
+                if (chkReduced) chkReduced.checked = activeFilters.soloOperados;
+                
+                // Actualizar texto en la versión 4
+                const appliedTextNode = document.getElementById('applied-filters-text');
+                if (appliedTextNode) {
+                    const parts = [activeFilters.categoria];
+                    if (activeFilters.plazo) parts.push(`Plazo: ${activeFilters.plazo}`);
+                    if (activeFilters.variacion && activeFilters.variacion !== 'Todas') parts.push(`Variación: ${activeFilters.variacion}`);
+                    if (activeFilters.moneda && activeFilters.moneda !== 'Todas') parts.push(`Moneda: ${activeFilters.moneda}`);
+                    if (activeFilters.soloOperados) parts.push('Ver sólo operados');
+                    appliedTextNode.textContent = parts.join(' | ');
+                }
+            };
+
+            document.getElementById('applied-filters-chips').addEventListener('click', (e) => {
+                const btnDropdown = e.target.closest('.btn-chip-dropdown');
+                if (btnDropdown) {
+                    e.stopPropagation(); 
+                    const type = btnDropdown.dataset.type;
+                    const menu = document.getElementById(`chip-menu-${type}`);
+                    
+                    document.querySelectorAll('.chip-dropdown-menu').forEach(m => {
+                        if (m.id !== `chip-menu-${type}`) m.classList.add('hidden');
+                    });
+                    
+                    if (menu) menu.classList.toggle('hidden');
+                    return;
+                }
+
+                const item = e.target.closest('.chip-dropdown-item');
+                if (item) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const type = item.dataset.type;
+                    const value = item.dataset.value;
+                    
+                    activeFilters[type] = value;
+                    
+                    if (type === 'categoria') {
+                        document.querySelectorAll('.filter-pill').forEach(p => {
+                            p.classList.remove('bg-blue-50', 'text-brand-active', 'border-blue-200');
+                            p.classList.add('bg-white', 'text-gray-600', 'border-gray-300', 'hover:bg-gray-50');
+                            if (p.textContent.trim() === value) {
+                                p.classList.remove('bg-white', 'text-gray-600', 'border-gray-300', 'hover:bg-gray-50');
+                                p.classList.add('bg-blue-50', 'text-brand-active', 'border-blue-200');
+                            }
+                        });
+                    } else {
+                        let defaultText = '';
+                        if (type === 'plazo') defaultText = 'Plazo: 24h';
+                        if (type === 'variacion') defaultText = 'Variación';
+                        if (type === 'moneda') defaultText = 'Moneda';
+                        updateDropdownUI(type, value, defaultText);
+                    }
+                    
+                    renderChips();
+                    return;
+                }
+            });
+
+            document.getElementById('chk-operados-reduced').addEventListener('change', (e) => {
+                activeFilters.soloOperados = e.target.checked;
+                const mainChk = document.getElementById('chk-operados');
+                if (mainChk) mainChk.checked = e.target.checked;
+                renderChips();
+            });
+
+            document.getElementById('chk-operados').addEventListener('change', (e) => {
+                activeFilters.soloOperados = e.target.checked;
+                const reducedChk = document.getElementById('chk-operados-reduced');
+                if (reducedChk) reducedChk.checked = e.target.checked;
+                renderChips();
+            });
+
+            document.querySelectorAll('.filter-dropdown-item').forEach(item => {
+                if(item.closest('#applied-filters-chips')) return; 
+
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const type = item.dataset.type;
+                    const value = item.dataset.value;
+                    activeFilters[type] = value;
+                    let defaultText = '';
+                    if (type === 'plazo') defaultText = 'Plazo: 24h';
+                    if (type === 'variacion') defaultText = 'Variación';
+                    if (type === 'moneda') defaultText = 'Moneda';
+                    updateDropdownUI(type, value, defaultText);
+                    renderChips();
+                    item.closest('[id^="dropdown-menu-"]').classList.add('hidden'); 
+                });
+            });
+
+            document.querySelectorAll('.filter-pill').forEach(pill => {
+                pill.addEventListener('click', (e) => {
+                    document.querySelectorAll('.filter-pill').forEach(p => {
+                        p.classList.remove('bg-blue-50', 'text-brand-active', 'border-blue-200');
+                        p.classList.add('bg-white', 'text-gray-600', 'border-gray-300', 'hover:bg-gray-50');
+                    });
+                    const target = e.currentTarget;
+                    target.classList.remove('bg-white', 'text-gray-600', 'border-gray-300', 'hover:bg-gray-50');
+                    target.classList.add('bg-blue-50', 'text-brand-active', 'border-blue-200');
+                    activeFilters.categoria = target.textContent.trim();
+                    renderChips();
+                });
+            });
+
+            renderChips(); 
+
+            // --- STICKY CON HISTÉRESIS (ANTI-REBOTE) ---
+            const handleScroll = () => {
+                if (window.scrollY > 10 && !isScrolled) {
+                    isScrolled = true;
+                    document.body.classList.add('scrolled');
+                } else if (window.scrollY <= 10 && isScrolled) {
+                    isScrolled = false;
+                    document.body.classList.remove('scrolled');
+                }
+
+                const filtersContainer = document.getElementById('main-filters-container');
+                if (filtersContainer) {
+                    const rect = filtersContainer.getBoundingClientRect();
+                    const offset = 64; 
+                    
+                    // Activar el sticky solo si cruza el umbral exacto
+                    if (rect.bottom < offset && !areFiltersScrolled) {
+                        areFiltersScrolled = true;
+                        document.body.classList.add('filters-scrolled');
+                        
+                        snapToFirstRow();
+                        
+                    // Desactivar SOLO si sube 40px por encima del umbral (104px)
+                    // Esto evita el bucle infinito al hacer snap hacia arriba
+                    } else if (rect.bottom >= (offset + 40) && areFiltersScrolled) {
+                        areFiltersScrolled = false;
+                        document.body.classList.remove('filters-scrolled');
+                    }
+                }
+            };
+            window.addEventListener('scroll', handleScroll, { passive: true });
+            handleScroll();
+
+            const updateFullscreenUI = (isFull) => {
+                document.querySelectorAll('.btn-fullscreen').forEach(btn => {
+                    if (isFull) {
+                        btn.innerHTML = '<i class="ph ph-corners-in text-[13.5px] leading-none"></i> <span class="leading-none pt-[1px]">Salir de pantalla completa</span>';
+                        btn.setAttribute('title', 'Salir de pantalla completa');
+                    } else {
+                        btn.innerHTML = '<i class="ph ph-corners-out text-[13.5px] leading-none"></i> <span class="leading-none pt-[1px]">Ver en pantalla completa</span>';
+                        btn.setAttribute('title', 'Atajo F11 u Opc+Cmd+F');
+                    }
+                });
+            };
+
+            const toggleFullscreen = async () => {
+                try {
+                    if (!document.fullscreenElement) {
+                        await document.documentElement.requestFullscreen();
+                    } else if (document.exitFullscreen) {
+                        await document.exitFullscreen();
+                    }
+                } catch (err) {
+                    console.warn(`No se pudo activar pantalla completa: ${err.message}`);
+                }
+            };
+
+            document.addEventListener('fullscreenchange', () => {
+                const isFull = !!document.fullscreenElement;
+                updateFullscreenUI(isFull);
+            });
+
+            document.querySelectorAll('.btn-fullscreen').forEach(btn => {
+                btn.addEventListener('click', toggleFullscreen);
+            });
+        });
+    </script>
+</body>
+</html>
