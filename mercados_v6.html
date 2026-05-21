@@ -65,7 +65,7 @@
             top: 0;
             z-index: 50;
             background-color: white;
-            transition: box-shadow 0.3s ease, border-color 0.3s ease;
+            transition: box-shadow 0.3s ease;
         }
         body.scrolled #top-nav {
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
@@ -74,15 +74,48 @@
         .header-row-2 { position: relative; z-index: 41; }
         .header-row-3 { position: relative; z-index: 40; }
 
-        .hide-on-scroll { transition: opacity 0.2s ease; }
-        body.scrolled .hide-on-scroll { display: none !important; }
-        .scrolled-show { display: none !important; }
-        body.scrolled .scrolled-show { display: flex !important; }
+        /* Clases para ocultar/mostrar elementos de la barra al scrollear */
+        .hide-on-scroll {
+            max-width: 250px;
+            opacity: 1;
+            overflow: hidden;
+            white-space: nowrap;
+            transition: max-width 0.3s ease, opacity 0.2s ease, margin 0.3s ease, padding 0.3s ease;
+        }
+        body.scrolled .hide-on-scroll {
+            max-width: 0px !important;
+            opacity: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            pointer-events: none;
+            border: none !important;
+        }
+
+        .scrolled-show {
+            max-width: 0px;
+            opacity: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            pointer-events: none;
+            margin-left: 0 !important;
+            transition: max-width 0.3s ease, opacity 0.2s ease, margin 0.3s ease, padding 0.3s ease;
+        }
+        body.scrolled .scrolled-show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        body.scrolled .scrolled-show.chip-margin {
+            max-width: 300px;
+            margin-left: 0.5rem !important; /* Separación con el icono de usuario */
+        }
 
         /* Animación del Logo y Menú (Fade y Push/Pull sin recortes ni escalas) */
         .logo-wrapper { 
             width: 146px; 
             opacity: 1;
+            overflow: hidden;
             transition: width 0.3s ease, opacity 0.2s ease; 
         }
         .logo-wrapper svg {
@@ -99,14 +132,12 @@
         .hamburger-wrapper {
             width: 0px;
             opacity: 0;
-            margin-right: 0;
             pointer-events: none;
-            transition: width 0.3s ease, opacity 0.2s ease, margin-right 0.3s ease;
+            transition: width 0.3s ease, opacity 0.2s ease;
         }
         body.scrolled .hamburger-wrapper {
             width: 32px;
             opacity: 1;
-            margin-right: 1rem;
             pointer-events: auto;
         }
 
@@ -259,13 +290,14 @@
 </head>
 <body class="text-text-main text-sm">
 
-    <!-- Fila 1: Top Nav -->
-    <header id="top-nav" class="w-full flex justify-center border-b border-gray-200">
+    <!-- Fila 1: Top Nav (Sin border-b por defecto, gana sombra al scrollear) -->
+    <header id="top-nav" class="w-full flex justify-center transition-shadow duration-300">
         <div class="flex items-center justify-between px-8 h-16 w-full max-w-[1792px]">
+            
             <div class="flex items-center h-8">
-                <!-- Menú Hamburguesa -->
+                <!-- Menú Hamburguesa (Aparece) -->
                 <div class="relative hamburger-wrapper" id="hamburger-menu-container">
-                    <button id="btn-hamburger" class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-brand-active hover:bg-blue-50 rounded-md transition-colors shrink-0">
+                    <button id="btn-hamburger" class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-brand-active hover:bg-blue-50 rounded-md transition-colors shrink-0 outline-none">
                         <i class="ph ph-list text-[24px]"></i>
                     </button>
                     <!-- Menú Desplegable Hamburguesa -->
@@ -279,7 +311,7 @@
                     </div>
                 </div>
 
-                <!-- Logo SVG -->
+                <!-- Logo SVG (Desaparece) -->
                 <div class="flex items-center h-full logo-wrapper">
                     <svg width="146" height="40" viewBox="0 0 146 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M30.1484 9.50942H6.05986C5.96528 9.50942 5.87296 9.54503 5.8054 9.60787L0.105839 14.9098C0.0382823 14.9726 0 15.0585 0 15.1465V20.3688C0 20.4568 0.0382823 20.5427 0.105839 20.6055L5.80765 25.9095C5.87521 25.9724 5.96754 26.008 6.06212 26.008H26.9778C27.1759 26.008 27.3381 25.8593 27.3381 25.6728V20.8443C27.3381 20.66 27.1759 20.5092 26.9778 20.5092H6.27154C6.07338 20.5092 5.91124 20.3604 5.91124 20.174V15.3434C5.91124 15.1591 6.07112 15.0082 6.27154 15.0082H29.9368C30.1349 15.0082 30.2971 15.1591 30.2971 15.3434V30.1641C30.2971 30.3484 30.1349 30.4992 29.9368 30.4992H10.8632C10.7686 30.4992 10.6763 30.5348 10.6087 30.5977L5.41807 35.4283C5.19063 35.6398 5.35277 36.0001 5.67254 36.0001H30.1507C30.2453 36.0001 30.3376 35.9645 30.4052 35.9017L36.1047 30.5977C36.1723 30.5348 36.2106 30.449 36.2106 30.361V15.1465C36.2106 15.0585 36.1723 14.9726 36.1047 14.9098L30.4052 9.60578C30.3376 9.54294 30.2453 9.50732 30.1507 9.50732" fill="#3557D4"/>
@@ -296,14 +328,29 @@
                 <input type="text" placeholder="Buscá un instrumento" class="w-full h-full pl-11 pr-4 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:border-brand-active focus:ring-1 focus:ring-brand-active">
             </div>
 
-            <div class="flex items-center gap-2 h-8">
-                <button class="text-gray-600 hover:text-gray-900 transition-colors flex items-center justify-center h-full w-8"><i class="ph ph-question text-2xl"></i></button>
-                <button class="text-gray-600 hover:text-gray-900 transition-colors relative flex items-center justify-center h-full w-8">
+            <div class="flex items-center h-8">
+                <button class="hide-on-scroll text-gray-600 hover:text-gray-900 transition-colors flex items-center justify-center h-full w-8 shrink-0">
+                    <i class="ph ph-question text-2xl"></i>
+                </button>
+                <button class="text-gray-600 hover:text-gray-900 transition-colors relative flex items-center justify-center h-full w-8 shrink-0 ml-2">
                     <i class="ph ph-bell text-2xl"></i><span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
                 </button>
-                <button class="text-gray-600 hover:text-gray-900 transition-colors flex items-center justify-center h-full w-8"><i class="ph ph-wallet text-2xl"></i></button>
-                <button class="text-gray-600 hover:text-gray-900 transition-colors flex items-center justify-center h-full w-8"><i class="ph ph-user-circle text-2xl"></i></button>
-                <div class="flex items-center bg-brand-active text-white rounded-lg shadow-sm h-full overflow-hidden">
+                <button class="text-gray-600 hover:text-gray-900 transition-colors flex items-center justify-center h-full w-8 shrink-0 ml-2">
+                    <i class="ph ph-wallet text-2xl"></i>
+                </button>
+                <button class="text-gray-600 hover:text-gray-900 transition-colors flex items-center justify-center h-full w-8 shrink-0 ml-2">
+                    <i class="ph ph-user-circle text-2xl"></i>
+                </button>
+                
+                <!-- Account Chip (Aparece a la derecha en scroll) -->
+                <div class="scrolled-show chip-margin flex items-center h-full">
+                    <div class="border border-blue-600 bg-blue-50/50 rounded-full px-5 h-full flex items-center text-[13px] text-gray-800 font-medium tracking-wide">
+                        CC 125780 | Pérez, Juan C...
+                    </div>
+                </div>
+                
+                <!-- Operar Button (Siempre visible) -->
+                <div class="ml-2 flex items-center bg-brand-active text-white rounded-lg shadow-sm h-full shrink-0">
                     <button class="px-4 h-full font-medium hover:bg-blue-700 transition-colors text-[14px] flex items-center">Operar</button>
                     <div class="w-px h-5 bg-white/40"></div>
                     <button class="px-2.5 h-full hover:bg-blue-700 transition-colors flex items-center"><i class="ph ph-caret-down text-lg"></i></button>
@@ -343,7 +390,8 @@
                     </div>
                 </div>
             </nav>
-            <div class="flex items-center h-full hide-on-scroll">
+            <div class="flex items-center h-full">
+                <!-- Se quita la clase hide-on-scroll ya que Fila 2 desaparece entera nativamente al scrollear -->
                 <div class="border border-blue-600 bg-blue-50/50 rounded-full px-5 h-8 flex items-center text-[13px] text-gray-800 font-medium tracking-wide">
                     CC 125780 | Pérez, Juan C...
                 </div>
